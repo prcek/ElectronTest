@@ -10,12 +10,10 @@
     "dist": "npm run compile && build",
     "release": "npm run compile && build"
   },
-
   "build": {
     "appId": "your.id",
     "category": "your.app.category.type"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/prcek/ElectronTest.git"
@@ -37,5 +35,9 @@
     "electron-prebuilt": "^1.2.0",
     "rimraf": "^2.5.4",
     "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "pouchdb-authentication": "^0.5.3",
+    "prcek_pouchdb": "^0.1.0"
   }
 }
