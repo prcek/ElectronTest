@@ -23,6 +23,6 @@ install:
 build_script:
   - node --version
   - npm --version
-  - npm run dist
+  - node_modules/.bin/build
 
 test: off
