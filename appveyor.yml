@@ -23,6 +23,9 @@ install:
 build_script:
   - node --version
   - npm --version
-  - node_modules/.bin/build
+  - npm run dist
+
+artifacts:
+  - path: dist
 
 test: off
