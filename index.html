@@ -2,18 +2,64 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
     <title>Hello World!</title>
+
+
+
+ <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+   body { margin: 32px; }
+  </style>
+
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+
+   <div class="panel panel-default">
+     <div class="panel-heading">app info</div>
+       <div class="panel-body">
+	    We are using node <script>document.write(process.versions.node)</script>,
+	    Chromium <script>document.write(process.versions.chrome)</script>,
+	    Electron <script>document.write(process.versions.electron)</script>,
+	    PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script><br/>
+            <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
+       </div>
+   </div>
+
+    <div class="panel panel-default">
+     <div class="panel-heading">key logger</div>
+       <div class="panel-body">
+		<div id="keylogger"></div>
+       </div>
+   </div>
+
+   
+
+
+    <div class="panel panel-default">
+       <div class="panel-heading">cdb</div>
+       <div class="panel-body">
+		<div id="cdb_status"></div>
+	        <div>Internet is <span id="internet_status"></span></div>
+		<button id="btn_cdb_sync" class="btn btn-danger btn-xs">sync db</button>
+		<button id="btn_cdb_sync_cancel" class="btn btn-danger btn-xs">sync db cancel</button>
+       </div>
+    </div>
+
   </body>
 
   <script>
-    // You can also require other files to run in this process
+  	const alertOnlineStatus = () => {
+   		document.getElementById("internet_status").innerText =  navigator.onLine ? 'online' : 'offline';
+  	}
+  	window.addEventListener('online',  alertOnlineStatus)
+  	window.addEventListener('offline',  alertOnlineStatus)
+  	alertOnlineStatus()
+  </script>
+
+  <script>
     require('./renderer.js')
   </script>
 </html>
