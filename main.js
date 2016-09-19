@@ -15,7 +15,7 @@ console.log(config.all());
 
 ipcMain.on('get_config', (event, name) => {
   console.log("get_config "+name); 
-  event.returnValue = config.get(name); 
+  event.returnValue = config.get(name,""); 
 })
 
 ipcMain.on('set_config', (event, name, value) => {
