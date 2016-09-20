@@ -99,5 +99,45 @@ document.getElementById("btn_cdb_sync_cancel").onclick = function() {
 
 
 
+//////////////////////////////////////////////////////////////
+// qrcode decode test
+var pako = require("pako");
+var crc32 = require("crc-32");
+
+function qr_unpack(b64Data) {
+  var strData     = atob(b64Data);
+  var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
+  var binData     = new Uint8Array(charData);
+  var data        = pako.inflate(binData);
+  var strData     = String.fromCharCode.apply(null, new Uint16Array(data));
+  return strData;
+}
+
+function qr_decode_z(val) {
+  vals = val.split("\*");
+  data = vals[2];
+  salt = 12345;
+  c = crc32.str(data+"*"+salt); 
+  if (c != vals[3]) {
+     console.log("wrong crc");
+//     alert("wrong crc");
+  } else {
+     console.log("crc is ok " + c);
+  } 
+  json_str = qr_unpack(data);
+  return JSON.parse(json_str);
+}
+
+
+const TEST_QR_VAL_C = "TS*38072*eJyrViouLcpLzE1VslJQckwBMpKVdBSUYCJeidmlSSCB4tTE4vw8kJCRgaGpvqEZRLACJJILYifnlxYVg/UYgrhlqUUgdkgwmJeZAuQYWxiYG9UCABEBHcs=*2213290619**"
+document.getElementById("decode_input").value = TEST_QR_VAL_C;
+document.getElementById("btn_decode_test").onclick = function() {
+	val = document.getElementById("decode_input").value;
+	dec_val = qr_decode_z(val);
+        console.log(dec_val);
+	//document.getElementById("decode_out").innerText = JSON.stringify(dec_val);
+	document.getElementById("decode_out").innerText = dec_val.id + " " + dec_val.name +" " +dec_val.surname;
+}; 
+
 
 
