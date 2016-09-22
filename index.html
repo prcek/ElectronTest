@@ -27,14 +27,14 @@
             <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
        </div>
    </div>
-
+<!--
     <div class="panel panel-default">
      <div class="panel-heading">key logger</div>
        <div class="panel-body">
 		<div id="keylogger"></div>
        </div>
    </div>
-
+-->
    
 
 
@@ -51,11 +51,19 @@
     <div class="panel panel-default">
        <div class="panel-heading">decode test</div>
        <div class="panel-body">
-	    	<form>
+	    	<form id="qrcode_form">
         	<div class="form-group">
-                	<input type="text" class="form-control" id="decode_input" placeholder="qrcode value">
+                  <input type="text" class="form-control" id="decode_input" placeholder="qrcode value">
         	</div>
     		</form>
+
+        <form id="qrcode_gid_form">
+          <div class="form-group">
+                  <input type="number" class="form-control" id="gid_input" placeholder="gid value">
+          </div>
+        </form>
+
+
 		<button id="btn_decode_test" class="btn btn-xs">decode</button>
 		<div id="decode_out"></div>
        </div>
