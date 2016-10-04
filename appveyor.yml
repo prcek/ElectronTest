@@ -26,11 +26,10 @@ build_script:
   - npm run dist
 
 artifacts:
-  - path: dist
-    name: all
+#  - path: dist
+#    name: all
   
-  - path: dist\win\*.exe
-    name: exe
+  - path: 'dist\win\electron-quick-start Setup 1.0.0.exe'
   
 
 test: off
