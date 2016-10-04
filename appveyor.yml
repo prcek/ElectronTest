@@ -10,6 +10,7 @@ cache:
   - '%USERPROFILE%\.electron'
 
 init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - git config --global core.autocrlf input
 
 install:
@@ -26,10 +27,13 @@ build_script:
   - npm run dist
 
 artifacts:
-  - path: dist/win
+  - path: 'dist\win\'
 #    name: all
   
 #  - path: 'dist\win\electron-quick-start Setup 1.0.0.exe'
   
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 test: off
