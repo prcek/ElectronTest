@@ -27,5 +27,10 @@ build_script:
 
 artifacts:
   - path: dist
+    name: all
+  
+  - path: dist\win\*.exe
+    name: exe
+  
 
 test: off
