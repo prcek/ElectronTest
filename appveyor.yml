@@ -28,6 +28,7 @@ build_script:
 
 artifacts:
   - path: 'dist\win-ia32\*.exe'
+    name: setup
   
 
 #on_finish:
