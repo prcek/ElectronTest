@@ -26,7 +26,7 @@ build_script:
   - ps: env
   - node --version
   - npm --version
-  - cmd: json -I -f package.json -e 'this.version=process.env.APPVEYOR_BUILD_VERSION'
+  - cmd: json -I -f C:\projects\electrontest\package.json -e 'this.version=process.env.APPVEYOR_BUILD_VERSION'
   - ps: get-content package.json
   - npm run dist
 
