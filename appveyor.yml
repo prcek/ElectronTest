@@ -19,7 +19,7 @@ install:
   - npm install npm -g
   - npm install -g json 
   - npm install electron-builder
-  - ps: iex (json -I -f package.json -e 'this.version=process.env.APPVEYOR_BUILD_VERSION')
+  - json -I -f package.json -e 'this.version=process.env.APPVEYOR_BUILD_VERSION'
   - ps: get-content package.json
   - npm install
   - npm prune
