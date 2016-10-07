@@ -40,6 +40,7 @@
     "bootstrap": "^3.3.7",
     "crc-32": "^0.4.1",
     "electron-json-config": "^1.4.0",
+    "font-awesome": "^4.6.3",
     "jquery": "^3.1.0",
     "pako": "^1.0.3",
     "pouchdb-authentication": "^0.5.3",

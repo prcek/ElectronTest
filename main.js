@@ -36,7 +36,7 @@ ipcMain.on('open_config_dialog', (event) => {
 
 function createMainWindow () {
   console.log("createMainWindow");
-  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreen: false})
+  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreen: false, autoHideMenuBar: true})
   
 
   mainWindow.loadURL(`file://${__dirname}/index.html`)
