@@ -69,13 +69,20 @@ local_db.createIndex({
     fields: ['ref_gid']
   }
 }).then(function (result) {
-  alert("index ready");
+//  alert("index ready");
+  console.log("index ready")
   console.log(result);
 }).catch(function (err) {
   alert("index err");
   console.log(err);
 });
 
+function cdb_get_course(id, callback) {
+  local_db.get(id).then(function (res) {
+    console.log(res)
+    callback(res)
+  })
+}
 
 
 function cdb_lookup(id,callback) {
@@ -165,7 +172,6 @@ function qr_decode_z(val) {
   c = crc32.str(data+"*"+salt); 
   if (c != vals[3]) {
      console.log("wrong crc");
-//     alert("wrong crc");
   } else {
      console.log("crc is ok " + c);
   } 
@@ -173,41 +179,68 @@ function qr_decode_z(val) {
   return JSON.parse(json_str);
 }
 
+function qr_cmd_decode_z(val) {
+  vals = val.split("\*");
+  data = vals[1];
+  c = crc32.str(data+"*"+vals[0]); 
+  if (c != vals[2]) {
+     console.log("wrong crc");
+  } else {
+     console.log("crc is ok " + c);
+  } 
+  json_str = qr_unpack(data);
+  return JSON.parse(json_str);
+}
 
 const TEST_QR_VAL_C = "TS*38072*eJyrViouLcpLzE1VslJQckwBMpKVdBSUYCJeidmlSSCB4tTE4vw8kJCRgaGpvqEZRLACJJILYifnlxYVg/UYgrhlqUUgdkgwmJeZAuQYWxiYG9UCABEBHcs=*2213290619**"
-document.getElementById("decode_input").value = TEST_QR_VAL_C;
+const TEST_QR_VAL_C2 = "TS_CMD*eJyrVkrOLy0qTo3PTFGyUlBKTC+oSssLqvKJKMhIds+pSs7w9XFNj3JJMg6rTDYKjUz3dHa08I13qUpP91XSUYBpzkvMTQVpr4opNTBINczOSUzJAzNTFIpLgAxDU8vUlHwQw8wwOz+nOBssaalQkpiXChI1gClHMjM5PwVsphFIrCy1CMQOCTYE8SBudY4Pdg0JDVCqBQAw3T4N*685749921**"
+
+document.getElementById("decode_input").value = TEST_QR_VAL_C2;
 document.getElementById("btn_decode_test").onclick = function() {
-	val = document.getElementById("decode_input").value;
+	  val = document.getElementById("decode_input").value;
 	dec_val = qr_decode_z(val);
-        console.log(dec_val);
+  console.log(dec_val);
 	document.getElementById("decode_out").innerText = dec_val.id + " " + dec_val.name +" " +dec_val.surname;
 }; 
 
 document.getElementById("qrcode_form").onsubmit = function(ev) {
-        ev.preventDefault(); 
+  ev.preventDefault(); 
 	val = document.getElementById("decode_input").value;
-        if (val == "") {
-		document.getElementById("decode_input").value = TEST_QR_VAL_C;
+  if (val == "") {
+		document.getElementById("decode_input").value = TEST_QR_VAL_C2;
 		return
 	}
-        document.getElementById("decode_input").value = "";
-	dec_val = qr_decode_z(val);
-	//alert("on submit " + dec_val.id);
-  cdb_lookup(dec_val.id, cdb_show_res);
+  document.getElementById("decode_input").value = "";
+
+  if (val.startsWith("TS*")) {
+	    dec_val = qr_decode_z(val);
+      cdb_lookup(dec_val.id, cdb_show_res);
+  } else if (val.startsWith("TS_CMD*")) {
+      dec_val = qr_cmd_decode_z(val);
+      console.log(dec_val);
+
+      if (dec_val.id.startsWith("C_") ) {
+        cdb_get_course(dec_val.course_id,function(course) {
+          // Commands:  C_SETUP, C_ADD, C_ADD_M, C_ADD_F
+
+          document.getElementById("decode_out").innerText = "CMD: " + dec_val.id + " " + course.code + " " + course.name;
+        })
+      } 
+  }
+
 };
 
 document.getElementById("decode_input").focus();
 
 function cdb_show_res(res) {
   if (res.docs.length != 1) {
-    //alert("not found!");
     document.getElementById("decode_out").innerText ="CDB: NOT FOUND";
     return;
   }
   doc = res.docs[0]
-  //alert('result is ' + doc.name );
   document.getElementById("decode_out").innerText ="CDB: " + doc.ref_gid + " " + doc.name +" " +doc.surname;
 }
+
 
 document.getElementById("qrcode_gid_form").onsubmit = function(ev) {
         ev.preventDefault(); 
