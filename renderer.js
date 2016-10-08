@@ -38,6 +38,8 @@ var PouchDB = require('prcek_pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
 
 var local_db = new PouchDB('cdb_local');
+var present_db = new PouchDB('present')
+
 
 
 
@@ -63,19 +65,86 @@ local_db.viewCleanup().then(function (result) {
 });
 
 
-
+//reg_gif
 local_db.createIndex({
   index: {
     fields: ['ref_gid']
   }
 }).then(function (result) {
-//  alert("index ready");
-  console.log("index ready")
+  console.log("ref_gid index ready");
   console.log(result);
 }).catch(function (err) {
-  alert("index err");
+  alert("ref_gid index err");
+  console.log("ref_gid index err");
   console.log(err);
 });
+
+//reg_gif
+local_db.createIndex({
+  index: {
+    fields: ['gae_ds_kind']
+  }
+}).then(function (result) {
+  console.log("gae_ds_kind index ready");
+  console.log(result);
+}).catch(function (err) {
+  alert("gae_ds_kind index err");
+  console.log("ref_gid index err");
+  console.log(err);
+});
+
+
+let current_course;
+function pdb_setup_course(course,callback) {
+  if (current_course) {
+    if (current_course._id != course._id) {
+      pdb_reset(function(res){
+        console.log(res);
+        callback("ok - swap")
+      })
+    } else {
+
+      //pdb_reset(function(res){
+      //  console.log(res);
+        callback("ok - same")
+      //})
+
+    }
+  } else {
+    current_course = course;
+    callback("ok - first");
+  }
+}
+
+function pdb_reset(callback) {
+  present_db.destroy().then(function(res) {
+    present_db = new PouchDB('present');
+    present_db.info(callback);
+  })
+}
+
+
+function pdb_put_student(student,callback) {
+  if ((current_course) && (student.course_key !=current_course._id)) {
+    callback("wrong course");
+  } else {
+    present_db.put({_id: student._id, data: student}).then(function(res){
+      console.log(res);
+      callback("ok")
+    }).catch(function(err){
+      console.log(err);
+      if (err.status == 409) {
+        callback("duplicate")
+      } else {
+        callback("err")
+      }
+    })
+  }
+}
+
+function pdb_get_stats(callback) {
+
+}
 
 function cdb_get_course(id, callback) {
   local_db.get(id).then(function (res) {
@@ -224,6 +293,11 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
           // Commands:  C_SETUP, C_ADD, C_ADD_M, C_ADD_F
 
           document.getElementById("decode_out").innerText = "CMD: " + dec_val.id + " " + course.code + " " + course.name;
+          if (dec_val.id == "C_SETUP") {
+            pdb_setup_course(course,function(res){
+              alert(res);
+            })
+          }
         })
       } 
   }
@@ -239,6 +313,10 @@ function cdb_show_res(res) {
   }
   doc = res.docs[0]
   document.getElementById("decode_out").innerText ="CDB: " + doc.ref_gid + " " + doc.name +" " +doc.surname;
+  pdb_put_student(doc,function(res){
+    alert(res);
+  })
+
 }
 
 
