@@ -93,11 +93,15 @@ local_db.createIndex({
   console.log(err);
 });
 
+//var access_courses = []
+//var access_courses_m = []
+
 
 let current_course;
 function pdb_setup_course(course,callback) {
   if (current_course) {
     if (current_course._id != course._id) {
+      current_course = course
       pdb_reset(function(res){
         console.log(res);
         callback("ok - swap")
@@ -115,6 +119,8 @@ function pdb_setup_course(course,callback) {
     callback("ok - first");
   }
 }
+
+
 
 function pdb_reset(callback) {
   present_db.destroy().then(function(res) {
@@ -216,6 +222,137 @@ document.getElementById("btn_cdb_sync").onclick = function() {
 document.getElementById("btn_cdb_sync_cancel").onclick = function() {
 	cdb_log("sync cancel");
         replication.cancel();	
+}; 
+
+//////////////////////////////////////////////////////////////
+// fill select boxes
+function fill_season_list() {
+  var select=document.getElementById("selectSeason")
+  local_db.find({
+    selector: {gae_ds_kind: "Season"},
+  }).then(function (result) {
+    console.log(result);
+    for(var i = 0; i < result.docs.length; i++) {
+      s = result.docs[i]
+      var el = document.createElement("option");
+      el.textContent = s.name;
+      el.value = s._id;
+      select.appendChild(el);
+    }
+  }).catch(function (err) {
+    alert("find err");
+    console.log(err);
+  });
+}
+
+function fill_folder_list() {
+  var select=document.getElementById("selectFolder")
+  local_db.find({
+    selector: {gae_ds_kind: "Folder"},
+  }).then(function (result) {
+    console.log(result);
+    for(var i = 0; i < result.docs.length; i++) {
+      s = result.docs[i]
+      var el = document.createElement("option");
+      el.textContent = s.name;
+      el.value = s._id;
+      select.appendChild(el);
+    }
+  }).catch(function (err) {
+    alert("find err");
+    console.log(err);
+  });
+}
+
+fill_season_list();
+fill_folder_list();
+
+
+function removeOptions(selectbox)
+{
+    var i;
+    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
+    {
+        selectbox.remove(i);
+    }
+}
+
+function removeLists(list_elem) {
+  while( list_elem.firstChild ){
+    list_elem.removeChild( list_elem.firstChild );
+  }
+}
+
+function getOption(selectbox) {
+  return selectbox.options[selectbox.selectedIndex].value;
+}
+
+function refill_course_list() {
+  var sf = document.getElementById("selectFolder");
+  var folder_key = sf.options[sf.selectedIndex].value;
+  var ss = document.getElementById("selectSeason");
+  var season_key = ss.options[ss.selectedIndex].value;
+
+  select =  document.getElementById("selectCourse");
+  removeOptions(select);
+
+  local_db.find({
+    selector: {gae_ds_kind: "Course"},
+  }).then(function (result) {
+    console.log(result);
+    for(var i = 0; i < result.docs.length; i++) {
+      s = result.docs[i]
+      if ((s.season_key == season_key) && (s.folder_key == folder_key)) {
+        var el = document.createElement("option");
+        el.textContent = s.code;
+        el.value = s._id;
+        select.appendChild(el);
+      }
+    }
+  }).catch(function (err) {
+    alert("find err");
+    console.log(err);
+  });
+
+
+}
+
+document.getElementById("selectFolder").addEventListener("change",refill_course_list);
+document.getElementById("selectSeason").addEventListener("change",refill_course_list);
+
+
+function refresh_course_lists() {
+      removeLists(document.getElementById("courseList"));
+
+}
+
+
+
+document.getElementById("btn_set_course").onclick = function(ev) {
+  ev.preventDefault(); 
+  var course_key=getOption(document.getElementById("selectCourse"))
+  cdb_get_course(course_key,function(course){
+    pdb_setup_course(course,function(res){
+      alert(res);
+      refresh_course_lists()
+    });
+  });
+}; 
+
+document.getElementById("btn_add_course").onclick = function(ev) {
+  ev.preventDefault(); 
+  var course_key=getOption(document.getElementById("selectCourse"))
+  cdb_get_course(course_key,function(course){
+   // alert(course.code);
+  });
+}; 
+
+document.getElementById("btn_add_m_course").onclick = function(ev) {
+  ev.preventDefault(); 
+  var course_key=getOption(document.getElementById("selectCourse"))
+  cdb_get_course(course_key,function(course){
+   // alert(course.code);
+  });
 }; 
 
 

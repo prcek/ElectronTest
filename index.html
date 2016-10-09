@@ -3,79 +3,149 @@
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Hello World!</title>
 
 
 
- <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
- <link href="node_modules/font-awesome/css/font-awesome.css" rel="stylesheet">
-  <style>
-   body { margin: 32px; }
-  </style>
+    <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="node_modules/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <style>
+      body { margin-top: 5px; height: 100%; }
+      div.main { height: 300px; }
+      div.vhcenter { 
+        position:relative;
+        top:50%;
+        transform: translateY(-50%);
+        text-align: center;
+       }
+      .bigfont {
+        font-size: 8em;
+      }
+      .redbg {
+        background-color: red;
+      }
+      .topbg {
+        background-color: #eeeeee;
+      }
+      .splitbg {
+        background-color: #555555;
+      }
+      .bottombg {
+        background-color: #eeeeee;
+      }
+    </style>
 
   </head>
-  <body>
+  <body id="body">
 
-   <div class="panel panel-default">
-     <div class="panel-heading">app info</div>
-       <div class="panel-body">
-	    We are using node <script>document.write(process.versions.node)</script>,
-	    Chromium <script>document.write(process.versions.chrome)</script>,
-	    Electron <script>document.write(process.versions.electron)</script>,
-	    PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script><br/>
-            <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
+  <div class="container-fluid">
+  
+    <div id="topbar" class="row topbg">  <!-- (status, cfg) row --> 
 
-<span class="fa-stack fa-5x">
-  <i class="fa fa-male fa-stack-1x "></i>
-  <i class="fa fa-ban fa-stack-2x text-danger"></i>
-</span>
-       </div>
-   </div>
-<!--
-    <div class="panel panel-default">
-     <div class="panel-heading">key logger</div>
-       <div class="panel-body">
-		<div id="keylogger"></div>
-       </div>
-   </div>
--->
-   
+      <div class="col-xs-6">
+      	We are using node <script>document.write(process.versions.node)</script>,
+      	Chromium <script>document.write(process.versions.chrome)</script>,
+  	    Electron <script>document.write(process.versions.electron)</script>,
+  	    PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script><br/>
+        <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
+      </div> <!-- end of col status -->    
 
+      <div class="col-xs-5"> 
+      		<div id="cdb_status"></div>
+      	  <div>Internet is <span id="internet_status"></span></div>
+      		<button id="btn_cdb_sync" class="btn btn-danger btn-xs">sync db</button>
+      		<button id="btn_cdb_sync_cancel" class="btn btn-danger btn-xs">sync db cancel</button>
+      </div> <!-- end of col sync -->    
 
-    <div class="panel panel-default">
-       <div class="panel-heading">cdb</div>
-       <div class="panel-body">
-		<div id="cdb_status"></div>
-	        <div>Internet is <span id="internet_status"></span></div>
-		<button id="btn_cdb_sync" class="btn btn-danger btn-xs">sync db</button>
-		<button id="btn_cdb_sync_cancel" class="btn btn-danger btn-xs">sync db cancel</button>
-       </div>
+      <div class="col-xs-1">
+        <span class="fa-stack fa-2x">
+          <i class="fa fa-male fa-stack-1x "></i>
+          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+        </span>
+      </div>  
+
+    </div>  <!-- end of (status, cfg) row --> 
+    <div class="row splitbg">&nbsp;</div>
+    <div id="setbar" class="row">  <!-- (status, cfg) row --> 
+      <form>
+      <div class="col-xs-2">
+        <div class="form-group">
+          <select id="selectSeason" class="form-control">
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-4">
+        <div class="form-group">
+          <select id="selectFolder" class="form-control">
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-2">
+        <div class="form-group">
+          <select id="selectCourse" class="form-control">
+          </select>
+        </div>
+      </div>
+      <div class="col-xs-4">
+        <button id="btn_set_course" class="btn btn-danger ">setup</button>
+        <button id="btn_add_course" class="btn btn-danger ">add</button>
+        <button id="btn_add_m_course" class="btn btn-danger ">add m</button>
+      </div>
+      </form>
     </div>
+    <div class="row splitbg">&nbsp;</div>
 
-    <div class="panel panel-default">
-       <div class="panel-heading">decode test</div>
-       <div class="panel-body">
-	    	<form id="qrcode_form">
-        	<div class="form-group">
-                  <input type="text" class="form-control" id="decode_input" placeholder="qrcode value">
-        	</div>
-    		</form>
-
-        <form id="qrcode_gid_form">
-          <div class="form-group">
-                  <input type="number" class="form-control" id="gid_input" placeholder="gid value">
-          </div>
-        </form>
-
-
-		<button id="btn_decode_test" class="btn btn-xs">decode</button>
-		<div id="decode_out"></div>
+    <div id="mainbar" class="row main">  <!-- main row -->
+     <div class="col-xs-4 main">
+     <div>
+       vsichni z
+       <ul id="courseList" class="list-inline">
+        <li>C1</li>
+        <li>C2</li>
+       </ul>
+      </div>
+      <div>
+       jen kluci z
+       <ul id="courseMList" class="list-inline">
+        <li>C1</li>
+        <li>C2</li>
+       </ul>
        </div>
-    </div>
+     </div>
+     <div class="col-xs-8 vhcenter">
+      <div class="bigfont redbg">sres</div>
+      <div class="redbg"> xxx </div>
+     </div>
+    </div> <!-- end of main row -->
 
 
+    <div class="row splitbg">&nbsp;</div>
+    <div id="bottombar" class="row bottombg"> <!-- scan row -->
+        <div class="col-xs-10">
+    	     <form id="qrcode_form">
+            	<div class="form-group">
+                      <input type="text" class="form-control" id="decode_input" placeholder="qrcode value">
+            	</div>
+        		</form>
+            <div id="decode_out"></div>
+
+        </div>
+        <div class="col-xs-2">
+            <form id="qrcode_gid_form">
+              <div class="form-group">
+                      <input type="number" class="form-control" id="gid_input" placeholder="gid value">
+              </div>
+            </form>
+
+
+    		    <button id="btn_decode_test" class="btn btn-xs">decode</button>
+        </div>
+    </div> <!-- end of scan row -->
+
+
+
+  </div> <!-- end of main .container-fluid -->
   </body>
 
   <script>
@@ -85,6 +155,17 @@
   	window.addEventListener('online',  alertOnlineStatus)
   	window.addEventListener('offline',  alertOnlineStatus)
   	alertOnlineStatus()
+  </script>
+
+  <script>
+   function calc_resize() {
+
+   //  var h = document.getElementById("body").clientHeight;  
+   //  h = h - document.getElementById("topbar").clientHeight;
+   //  h = h - document.getElementById("bottombar").clientHeight ;
+   //  document.getElementById("mainbar").style.height = (h-50)+"px"
+   }
+    window.addEventListener('resize', calc_resize, true);
   </script>
 
   <script>
