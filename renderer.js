@@ -82,7 +82,7 @@ local_db.createIndex({
 //reg_gif
 local_db.createIndex({
   index: {
-    fields: ['gae_ds_kind']
+    fields: ['gae_ds_kind','season_key','folder_key','course_key']
   }
 }).then(function (result) {
   console.log("gae_ds_kind index ready");
@@ -297,17 +297,15 @@ function refill_course_list() {
   removeOptions(select);
 
   local_db.find({
-    selector: {gae_ds_kind: "Course"},
+    selector: {gae_ds_kind: "Course", season_key: season_key, folder_key: folder_key},
   }).then(function (result) {
     console.log(result);
     for(var i = 0; i < result.docs.length; i++) {
       s = result.docs[i]
-      if ((s.season_key == season_key) && (s.folder_key == folder_key)) {
-        var el = document.createElement("option");
-        el.textContent = s.code;
-        el.value = s._id;
-        select.appendChild(el);
-      }
+      var el = document.createElement("option");
+      el.textContent = s.code;
+      el.value = s._id;
+      select.appendChild(el);
     }
   }).catch(function (err) {
     alert("find err");
