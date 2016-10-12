@@ -22,8 +22,14 @@
       .bigfont {
         font-size: 8em;
       }
+      .medfont {
+        font-size: 3em;
+      }
       .redbg {
         background-color: red;
+      }
+      .greenbg {
+        background-color: green;
       }
       .topbg {
         background-color: #eeeeee;
@@ -34,6 +40,22 @@
       .bottombg {
         background-color: #eeeeee;
       }
+
+      div.flash_border {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+      }
+
+      div.flash_border_active {
+        background-color: gray;
+      }
+
+      div.flash_border_inner {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+      }
     </style>
 
   </head>
@@ -43,7 +65,7 @@
   
     <div id="topbar" class="row topbg">  <!-- (status, cfg) row --> 
 
-      <div class="col-xs-6">
+      <div class="col-xs-4">
       	We are using node <script>document.write(process.versions.node)</script>,
       	Chromium <script>document.write(process.versions.chrome)</script>,
   	    Electron <script>document.write(process.versions.electron)</script>,
@@ -51,12 +73,33 @@
         <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
       </div> <!-- end of col status -->    
 
-      <div class="col-xs-5"> 
+      <div class="col-xs-4"> 
       		<div id="cdb_status"></div>
       	  <div>Internet is <span id="internet_status"></span></div>
       		<button id="btn_cdb_sync" class="btn btn-danger btn-xs">sync db</button>
       		<button id="btn_cdb_sync_cancel" class="btn btn-danger btn-xs">sync db cancel</button>
       </div> <!-- end of col sync -->    
+
+      <div class="col-xs-3"> 
+          <div>
+            <i id="sys_status_icon_remotedb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_remotedb">?</span>
+          </div>
+
+          <div>
+            <i id="sys_status_icon_syncdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_syncdb">?</span>
+          </div>
+
+          <div>
+            <i id="sys_status_icon_localdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb">?</span>
+          </div>
+          <div>
+            <i id="sys_status_icon_online" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_online">?</span>
+          </div>
+      </div> <!-- end of col cdb status -->    
 
       <div class="col-xs-1">
         <span class="fa-stack fa-2x">
@@ -114,8 +157,14 @@
        </div>
      </div>
      <div class="col-xs-8 vhcenter">
-      <div class="bigfont redbg">sres</div>
-      <div class="redbg"> xxx </div>
+      <div id="scn_anim_div" class="flash_border"> 
+        <div class="flash_border_inner">
+          <div id="scn_res_div" class="bigfont redbg">
+              <i id="scn_res_icon" class="fa fa-question" ></i>
+          </div>
+          <div id="scn_res_name_div" class="medfont redbg"></div>
+        </div>
+      </div>
      </div>
     </div> <!-- end of main row -->
 
@@ -149,8 +198,257 @@
   </body>
 
   <script>
+    function sys_status_online() {
+           document.getElementById("sys_status_text_online").innerText ='online'
+           document.getElementById("sys_status_icon_online").className = 'fa fa-wifi text-success'
+    }
+    function sys_status_offline() {
+           document.getElementById("sys_status_text_online").innerText ='offline'
+           document.getElementById("sys_status_icon_online").className = 'fa fa-wifi text-danger'
+    }
+    function sys_status_localdb_ready() {
+           document.getElementById("sys_status_text_localdb").innerText ='ldb ready'
+           document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-success'
+    }
+    function sys_status_localdb_error() {
+           document.getElementById("sys_status_text_localdb").innerText ='ldb error'
+           document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-danger'
+    }
+    function sys_status_localdb_indexing() {
+           document.getElementById("sys_status_text_localdb").innerText ='ldb indexing'
+           document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-warning'
+    }
+
+    function sys_status_remotedb_ready() {
+           document.getElementById("sys_status_text_remotedb").innerText ='rdb ready'
+           document.getElementById("sys_status_icon_remotedb").className = 'fa fa-database text-success'
+    }
+    function sys_status_remotedb_error() {
+           document.getElementById("sys_status_text_remotedb").innerText ='rdb error'
+           document.getElementById("sys_status_icon_remotedb").className = 'fa fa-database text-danger'
+    }
+    function sys_status_syncdb_idle() {
+           document.getElementById("sys_status_text_syncdb").innerText ='idle'
+           document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh text-success'
+    }
+    function sys_status_syncdb_active() {
+           document.getElementById("sys_status_text_syncdb").innerText ='syncing'
+           document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh fa-spin text-warning'
+    }
+    function sys_status_syncdb_tick() {
+           //document.getElementById("sys_status_text_syncdb").innerText ='idle'
+           //document.getElementById("sys_status_icon_syncdb").className = 'fa fa-database text-success'
+    }
+    function sys_status_syncdb_error() {
+           document.getElementById("sys_status_text_syncdb").innerText ='sync error'
+           document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh text-danger'
+    }
+    function sys_status_syncdb_done() {
+           document.getElementById("sys_status_text_syncdb").innerText ='sync done'
+           document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh text-success'
+    }
+
+
+    /////////////////////  scan ////////////////
+
+var SCAN_RESULT = (function() {
+
+  var my = {}
+  
+  const hide_timeout = 20000;
+  const post_flash_delay = 200;
+  const flash_interval = 100;
+
+
+  var scn_res_div = document.getElementById("scn_res_div");
+  var scn_res_name_div = document.getElementById("scn_res_name_div");
+  var scn_anim_div = document.getElementById("scn_anim_div");
+
+  var anim_state = false;
+  function set_anim_st() {
+    if (anim_state) {
+      scn_anim_div.classList.remove("flash_border_active")
+    } else {
+      scn_anim_div.classList.add("flash_border_active")
+    }
+    anim_state = ! anim_state;
+  }
+  var timer1=null; 
+  var timer2=null;
+  function start_anim() {
+      if (timer1 == null) {
+        timer1 = window.setInterval(set_anim_st,flash_interval);
+      }
+  }
+
+  function stop_anim() { 
+      if (timer1 != null) {
+        window.clearInterval(timer1);
+        timer1 = null;
+        scn_anim_div.classList.remove("flash_border_active")
+        anim_state = false;
+      }
+  }
+
+  function clear() {
+    scn_res_div.classList.remove("redbg");
+    scn_res_div.classList.remove("greenbg");
+    scn_res_name_div.classList.remove("redbg");
+    scn_res_name_div.classList.remove("greenbg");
+
+    scn_res_div.innerHTML = '&nbsp;';
+    scn_res_name_div.innerHTML = '&nbsp';
+  }  
+
+  function plan_clear() {
+    if (timer2 != null) {
+      window.clearTimeout(timer2);
+    }
+    timer2 = window.setTimeout(function(){
+      timer2=null;
+      clear();
+    },hide_timeout);
+  }
+
+  function set_positive() {
+    scn_res_div.classList.add("greenbg");
+    scn_res_div.classList.remove("redbg");
+    scn_res_name_div.classList.add("greenbg");
+    scn_res_name_div.classList.remove("redbg");
+
+  }
+  function set_negative() {
+    scn_res_div.classList.add("redbg");
+    scn_res_div.classList.remove("greenbg");
+    scn_res_name_div.classList.add("redbg");
+    scn_res_name_div.classList.remove("greenbg");
+  }
+
+  function set_icon(icon, color) {
+    while (scn_res_div.firstChild) {
+      scn_res_div.removeChild(scn_res_div.firstChild);
+    }
+    var el = document.createElement("i");
+    el.classList.add("fa");
+    el.classList.add(icon);
+    el.style.color= color;
+    scn_res_div.appendChild(el);
+  }
+
+  function set_male() {
+    set_icon("fa-male","white");
+  }
+  function set_female() {
+    set_icon("fa-female","black");
+  }
+  function set_thumbup() {
+    set_icon("fa-thumbs-o-up","white");
+  }
+  function set_invalid() {
+    set_icon("fa-exclamation-triangle","white");
+  }
+  function set_dupl() {
+    set_icon("fa-users","white");
+  }
+ 
+  my.flash = function () {
+      clear();
+      start_anim();
+  }
+
+  my.show_ready = function() {
+      set_positive();
+      set_thumbup();
+      stop_anim();
+
+//      scn_res_name_div.innerText ="Reactor Online. Sensors Online. Weapons Online. All Systems Nominal.";
+      scn_res_name_div.innerText ="All Systems Nominal.";
+      plan_clear();
+  }
+
+  my.show_ok_male = function (name) {
+      set_positive();
+      set_male();
+
+      if (name) {
+        scn_res_name_div.innerText = name;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+  my.show_dupl_male = function (name) {
+      set_negative();
+      set_dupl();
+
+      if (name) {
+        scn_res_name_div.innerText = name;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+
+  my.show_ok_female = function (name) {
+      set_positive();
+      set_female();
+
+      if (name) {
+        scn_res_name_div.innerText = name;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+  my.show_dupl_female = function (name) {
+      set_negative();
+      set_dupl();
+
+      if (name) {
+        scn_res_name_div.innerText = name;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+  my.show_error = function (desc) {
+      set_negative();
+      set_invalid();
+      if (desc) {
+        scn_res_name_div.innerText = desc;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+
+  return my
+}());    
+
+
+  </script>
+
+  <script>
   	const alertOnlineStatus = () => {
-   		document.getElementById("internet_status").innerText =  navigator.onLine ? 'online' : 'offline';
+      if (navigator.onLine) {
+            sys_status_online();
+      } else {
+            sys_status_offline();
+      }
   	}
   	window.addEventListener('online',  alertOnlineStatus)
   	window.addEventListener('offline',  alertOnlineStatus)

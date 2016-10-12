@@ -50,45 +50,38 @@ function cdb_log(x) {
 
 local_db.info().then(function (result){
    console.log(result);
-   cdb_log("local db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
+   sys_status_localdb_ready()
+   //cdb_log("local db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
 }).catch(function (err){
-   cdb_log("local db err = " + err);
+   //cdb_log("local db err = " + err);
    console.log(err);
+   sys_status_localdb_error()
 });
 
 
-local_db.viewCleanup().then(function (result) {
+//local_db.viewCleanup().then(function (result) {
 //  alert("db viewCleanup done");
-  console.log(result);
-}).catch(function (err) {
-  console.log(err);
-});
+//  console.log(result);
+//}).catch(function (err) {
+//  console.log(err);
+//});
+
+
+//reg_gif
+sys_status_localdb_indexing();
 
 
 //reg_gif
 local_db.createIndex({
   index: {
-    fields: ['ref_gid']
+    fields: ['ref_gid','gae_ds_kind','season_key','folder_key','course_key']
   }
 }).then(function (result) {
-  console.log("ref_gid index ready");
-  console.log(result);
-}).catch(function (err) {
-  alert("ref_gid index err");
-  console.log("ref_gid index err");
-  console.log(err);
-});
-
-//reg_gif
-local_db.createIndex({
-  index: {
-    fields: ['gae_ds_kind','season_key','folder_key','course_key']
-  }
-}).then(function (result) {
+  sys_status_localdb_ready()
   console.log("gae_ds_kind index ready");
   console.log(result);
 }).catch(function (err) {
-  alert("gae_ds_kind index err");
+  sys_status_localdb_error()
   console.log("ref_gid index err");
   console.log(err);
 });
@@ -181,38 +174,48 @@ function cdb_lookup(id,callback) {
 var remote_db_url = ipcRenderer.sendSync('get_config', 'cdb_url');
 var remote_db = new PouchDB(remote_db_url);
 
+function remotedb_state() {
+  remote_db.info().then(function (result){
+     console.log(result);
+     sys_status_remotedb_ready()
+     if (!first_sync) {
+        cdb_sync();
+     }
+     //cdb_log("remote db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
+  }).catch(function (err){
+     //cdb_log("remote db err = " + err);
+     console.log(err);
+     sys_status_remotedb_error()
+  });
+}
+remotedb_state();
+window.setInterval(remotedb_state,60000);
 
-remote_db.info().then(function (result){
-   console.log(result);
-   cdb_log("remote db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
-}).catch(function (err){
-   cdb_log("remote db err = " + err);
-   console.log(err);
-});
-
-
+var first_sync = false;
 let replication;
+sys_status_syncdb_idle();
 function cdb_sync() {
-   replication = PouchDB.replicate(remote_db,local_db, {live:false, retry:true}).on('change', function (info) {
-   cdb_log('change ' + info);
+  first_sync = true;
+  replication = PouchDB.replicate(remote_db,local_db, {live:false, retry:true}).on('change', function (info) {
+  sys_status_syncdb_tick();
 }).on('paused', function (err) {
-  // replication paused (e.g. replication up to date, user went offline)
-   cdb_log('paused '+err);
+  sys_status_syncdb_idle();
 }).on('active', function () {
-  // replicate resumed (e.g. new changes replicating, user went back online)
-   cdb_log('active');
+  sys_status_syncdb_active();
 }).on('denied', function (err) {
-  // a document failed to replicate (e.g. due to permissions)
-   cdb_log('denied ' +err);
+  sys_status_syncdb_error();
 }).on('complete', function (info) {
-  // handle complete
-   cdb_log('complete '+info);
-   console.log(info);
+  sys_status_syncdb_done();
 }).on('error', function (err) {
-  // handle error
-   cdb_log('error '+err);
+  sys_status_syncdb_error();
 }); 
 }
+remote_db.info().then(function (result){
+  cdb_sync();
+})
+
+
+
 
 document.getElementById("btn_cdb_sync").onclick = function() {
 	cdb_log("sync start");
@@ -461,4 +464,4 @@ document.getElementById("qrcode_gid_form").onsubmit = function(ev) {
         cdb_lookup(parseInt(val),cdb_show_res);
 };
 
-
+SCAN_RESULT.show_ready();
