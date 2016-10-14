@@ -345,12 +345,18 @@ var SCAN_RESULT = (function() {
     set_icon("fa-thumbs-o-up","white");
   }
   function set_invalid() {
+    set_icon("fa-trash-o","white");
+  }
+  function set_error() {
     set_icon("fa-exclamation-triangle","white");
   }
   function set_dupl() {
     set_icon("fa-users","white");
   }
- 
+  function set_setup() {
+    set_icon("fa-wrench","white");
+  }
+
   my.flash = function () {
       clear();
       start_anim();
@@ -423,7 +429,31 @@ var SCAN_RESULT = (function() {
       plan_clear();
   }
 
+  my.show_setup = function (desc) {
+      set_positive();
+      set_setup();
+      if (desc) {
+        scn_res_name_div.innerText = desc;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
   my.show_error = function (desc) {
+      set_negative();
+      set_error();
+      if (desc) {
+        scn_res_name_div.innerText = desc;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+  my.show_invalid = function (desc) {
       set_negative();
       set_invalid();
       if (desc) {
@@ -435,8 +465,7 @@ var SCAN_RESULT = (function() {
       plan_clear();
   }
 
-
-  return my
+  return my;
 }());    
 
 
