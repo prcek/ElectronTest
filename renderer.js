@@ -358,58 +358,19 @@ document.getElementById("btn_add_m_course").onclick = function(ev) {
 
 
 
-//////////////////////////////////////////////////////////////
-// qrcode decode test
-var pako = require("pako");
-var crc32 = require("crc-32");
 
-function qr_unpack(b64Data) {
-  var strData     = atob(b64Data);
-  var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
-  var binData     = new Uint8Array(charData);
-  var data        = pako.inflate(binData);
-  var strData     = String.fromCharCode.apply(null, new Uint16Array(data));
-  return strData;
+function set_test_value(ev) {
+    document.getElementById("decode_input").value = ev.target.getAttribute("value");
+    document.getElementById("qrcode_form").onsubmit(ev);
 }
+document.getElementById("btn_test_code1").addEventListener("click",set_test_value);
+document.getElementById("btn_test_code2").addEventListener("click",set_test_value);
+document.getElementById("btn_test_code3").addEventListener("click",set_test_value);
+document.getElementById("btn_test_code4").addEventListener("click",set_test_value);
 
-function qr_decode_z(val) {
-  vals = val.split("\*");
-  data = vals[2];
-  salt = 12345;
-  c = crc32.str(data+"*"+salt); 
-  if (c != vals[3]) {
-     console.log("wrong crc");
-  } else {
-     console.log("crc is ok " + c);
-  } 
-  json_str = qr_unpack(data);
-  return JSON.parse(json_str);
-}
 
-function qr_cmd_decode_z(val) {
-  vals = val.split("\*");
-  data = vals[1];
-  c = crc32.str(data+"*"+vals[0]); 
-  if (c != vals[2]) {
-     console.log("wrong crc");
-  } else {
-     console.log("crc is ok " + c);
-  } 
-  json_str = qr_unpack(data);
-  return JSON.parse(json_str);
-}
 
-const TEST_QR_VAL_C = "TS*38072*eJyrViouLcpLzE1VslJQckwBMpKVdBSUYCJeidmlSSCB4tTE4vw8kJCRgaGpvqEZRLACJJILYifnlxYVg/UYgrhlqUUgdkgwmJeZAuQYWxiYG9UCABEBHcs=*2213290619**"
-const TEST_QR_VAL_C2 = "TS_CMD*eJyrVkrOLy0qTo3PTFGyUlBKTC+oSssLqvKJKMhIds+pSs7w9XFNj3JJMg6rTDYKjUz3dHa08I13qUpP91XSUYBpzkvMTQVpr4opNTBINczOSUzJAzNTFIpLgAxDU8vUlHwQw8wwOz+nOBssaalQkpiXChI1gClHMjM5PwVsphFIrCy1CMQOCTYE8SBudY4Pdg0JDVCqBQAw3T4N*685749921**"
-
-document.getElementById("decode_input").value = TEST_QR_VAL_C2;
-document.getElementById("btn_decode_test").onclick = function() {
-	  val = document.getElementById("decode_input").value;
-	dec_val = qr_decode_z(val);
-  console.log(dec_val);
-	document.getElementById("decode_out").innerText = dec_val.id + " " + dec_val.name +" " +dec_val.surname;
-}; 
-
+/*
 document.getElementById("qrcode_form").onsubmit = function(ev) {
   ev.preventDefault(); 
 	val = document.getElementById("decode_input").value;
@@ -441,6 +402,7 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
   }
 
 };
+*/
 
 document.getElementById("decode_input").focus();
 
@@ -458,10 +420,71 @@ function cdb_show_res(res) {
 }
 
 
-document.getElementById("qrcode_gid_form").onsubmit = function(ev) {
-        ev.preventDefault(); 
-        val = document.getElementById("gid_input").value;
-        cdb_lookup(parseInt(val),cdb_show_res);
-};
+
+document.getElementById("decode_input").oninput = function () {
+  SCAN_RESULT.flash()
+}
+
+var CRC = require("crc");
+function check_ts_crc(val) {
+  vals = val.split("\*");
+  data = vals[2];
+  crc = vals[4];
+  c = CRC.crc32(data+"*"+vals[0]);
+//  console.log(c.toString(2) + " vs. " + Number.parseInt(crc,10).toString(2) ) ; 
+  return (c == crc) 
+}
+
+function check_tscmd_crc(val) {
+  vals = val.split("\*");
+  data = vals[1];
+  crc = vals[2];
+  c = CRC.crc32(data+"*"+vals[0]); 
+//  console.log(c.toString(2) + " vs. " + Number.parseInt(crc,10).toString(2) ) ; 
+  return (c == crc) 
+}
+
+var PAKO = require("pako");
+function unpack_json(val) {
+  var strData     = atob(val);
+  var charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
+  var binData     = new Uint8Array(charData);
+  var data        = PAKO.inflate(binData);
+  var strData     = String.fromCharCode.apply(null, new Uint16Array(data));
+  return JSON.parse(strData);
+}
+
+document.getElementById("qrcode_form").onsubmit = function(ev) {
+  ev.preventDefault(); 
+  val = document.getElementById("decode_input").value;
+  document.getElementById("decode_input").value = "";
+  console.log(val);
+
+  if (val.startsWith("TS*")) {
+    if (!check_ts_crc(val)) {
+      SCAN_RESULT.show_error("Neplatný ochraný kód.");
+    } else {
+      d = unpack_json(val.split("\*")[2]);      
+      //console.log(d);
+      ref_gid = d.id;
+      SCAN_RESULT.show_ok_male(d.name);
+    }
+  } else if (val.startsWith("TS_CMD*")) {
+    if (!check_tscmd_crc(val)) {
+      SCAN_RESULT.show_error("Neplatný ochraný kód.");
+    } else {
+      d = unpack_json(val.split("\*")[1]);
+      //console.log(d);
+      SCAN_RESULT.show_setup(d.id);
+    }
+  } else {
+      SCAN_RESULT.show_error("Neznámý typ karty.")
+  }
+}
+
+
+//////////////////////////////
 
 SCAN_RESULT.show_ready();
+
+
