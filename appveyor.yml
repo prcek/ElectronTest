@@ -14,7 +14,7 @@ init:
   - git config --global core.autocrlf input
 
 install:
-  - ps: Install-Product node 6.8.1 x86
+  - ps: Install-Product node 4.6.0 x86
   - git reset --hard HEAD
   - npm install npm -g
   - npm install -g json 
