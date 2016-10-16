@@ -8,7 +8,8 @@
     "compile": "rimraf app/out && tsc",
     "pack": "npm run compile && build --dir",
     "dist": "npm run compile && build",
-    "release": "npm run compile && build"
+    "release": "npm run compile && build",
+    "postinstall": "electron-rebuild --pre-gyp-fix --force"
   },
   "build": {
     "appId": "your.id",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "electron-builder": "^6.3.1",
     "electron-prebuilt": "^1.2.0",
+    "electron-rebuild": "^1.2.1",
     "rimraf": "^2.5.4",
     "typescript": "^1.8.10"
   },
@@ -42,9 +44,11 @@
     "electron-json-config": "^1.4.0",
     "font-awesome": "^4.6.3",
     "jquery": "^3.1.0",
+    "node-hid": "^0.5.1",
     "pako": "^1.0.3",
     "pouchdb-authentication": "^0.5.3",
     "pouchdb-find": "^0.10.3",
-    "prcek_pouchdb": "^0.1.0"
+    "prcek_pouchdb": "^0.1.0",
+    "serialport": "^4.0.3"
   }
 }
