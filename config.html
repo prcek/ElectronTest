@@ -17,6 +17,10 @@
 	<div class="form-group">
     		<label for="input_cdb_url">CDB url</label>
     		<input type="url" class="form-control" id="input_cdb_url" placeholder="Url">
+        <label for="input_autofs">Auto fullscreen</label>
+        <input type="checkbox" class="form-control" id="input_autofs">
+        <label for="input_scanbox_height">Vyska scan boxu</label>
+        <input type="number" class="form-control" id="input_scanbox_height">
   	</div>
     </form>
     <button id="close-btn" class="btn btn-default btn-xs">close &amp; save</button>
@@ -24,15 +28,36 @@
 
   <script>
 	const ipcRenderer = require('electron').ipcRenderer;
-        function savecfg() {
+  
+  function savecfg() {
+
 		val = document.getElementById("input_cdb_url").value;
 		ipcRenderer.send("set_config","cdb_url",val);	
+
+    val = document.getElementById("input_autofs").checked;
+    ipcRenderer.send("set_config","autofs",val); 
+
+    val = document.getElementById("input_scanbox_height").value;
+    ipcRenderer.send("set_config","scanbox_height",val); 
+
 	}
-        function loadcfg() {
-		val = ipcRenderer.sendSync('get_config', 'cdb_url');
+  
+  function loadcfg() {
+	
+  	val = ipcRenderer.sendSync('get_config', 'cdb_url');
 		console.log("get url " + val);
 		document.getElementById("input_cdb_url").value = val;
-        }
+
+    val = ipcRenderer.sendSync('get_config', 'autofs');
+    console.log("get autofs " + val);
+    document.getElementById("input_autofs").checked = val;
+
+    val = ipcRenderer.sendSync('get_config', 'scanbox_height');
+    console.log("get scanbox_height " + val);
+    document.getElementById("input_scanbox_height").value = val;
+
+
+  }
 	const remote = require('electron').remote;
 	document.getElementById("close-btn").addEventListener("click", function (e) {
 		savecfg();
