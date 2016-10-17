@@ -299,7 +299,24 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
 };
 */
 
-document.getElementById("decode_input").focus();
+
+//// HOLD focus
+set_focus();
+var last_focus_time = 0;
+function hold_focus() {
+  if (document.activeElement.id == "decode_input") {
+    last_focus_time = Date.now();
+  } else {
+    if ((Date.now() - last_focus_time) > 5000)  {
+        last_focus_time = Date.now();
+        set_focus();
+    }
+  }
+}
+window.setInterval(hold_focus,1000);
+//// END of hold focus
+
+
 
 function cdb_show_res(res) {
   if (res.docs.length != 1) {
