@@ -95,6 +95,16 @@
             <i id="sys_status_icon_localdb" class="fa fa-question" aria-hidden="true"></i>
             <span id="sys_status_text_localdb">?</span>
           </div>
+
+          <div>
+            <i id="sys_status_icon_localdb_ia" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb_ia">?</span>
+          </div>
+          <div>
+            <i id="sys_status_icon_localdb_ib" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb_ib">?</span>
+          </div>
+
           <div>
             <i id="sys_status_icon_online" class="fa fa-question" aria-hidden="true"></i>
             <span id="sys_status_text_online">?</span>
@@ -207,9 +217,25 @@
            document.getElementById("sys_status_text_localdb").innerText ='ldb error'
            document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-danger'
     }
-    function sys_status_localdb_indexing() {
-           document.getElementById("sys_status_text_localdb").innerText ='ldb indexing'
-           document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-warning'
+
+    function sys_status_localdb_index_A_indexing() {
+           document.getElementById("sys_status_text_localdb_ia").innerText ='idx A indexing'
+           document.getElementById("sys_status_icon_localdb_ia").className = 'fa fa-database text-warning'
+    }
+
+    function sys_status_localdb_index_A_ready() {
+           document.getElementById("sys_status_text_localdb_ia").innerText ='idx A ready'
+           document.getElementById("sys_status_icon_localdb_ia").className = 'fa fa-database text-success'
+    }
+
+    function sys_status_localdb_index_B_indexing() {
+           document.getElementById("sys_status_text_localdb_ib").innerText ='idx B indexing'
+           document.getElementById("sys_status_icon_localdb_ib").className = 'fa fa-database text-warning'
+    }
+
+    function sys_status_localdb_index_B_ready() {
+           document.getElementById("sys_status_text_localdb_ib").innerText ='idx B ready'
+           document.getElementById("sys_status_icon_localdb_ib").className = 'fa fa-database text-success'
     }
 
     function sys_status_remotedb_ready() {

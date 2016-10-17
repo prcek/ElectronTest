@@ -68,16 +68,31 @@ local_db.info().then(function (result){
 
 
 //reg_gif
-sys_status_localdb_indexing();
+sys_status_localdb_index_A_indexing();
 
 
 //reg_gif
 local_db.createIndex({
   index: {
-    fields: ['ref_gid','gae_ds_kind','season_key','folder_key','course_key']
+    fields: ['gae_ds_kind','season_key','folder_key','course_key']
   }
 }).then(function (result) {
-  sys_status_localdb_ready()
+  sys_status_localdb_index_A_ready();
+  console.log("gae_ds_kind index ready");
+  console.log(result);
+}).catch(function (err) {
+  sys_status_localdb_error()
+  console.log("ref_gid index err");
+  console.log(err);
+});
+
+sys_status_localdb_index_B_indexing();
+local_db.createIndex({
+  index: {
+    fields: ['gae_ds_kind','ref_gid']
+  }
+}).then(function (result) {
+  sys_status_localdb_index_B_ready();
   console.log("gae_ds_kind index ready");
   console.log(result);
 }).catch(function (err) {
@@ -158,7 +173,7 @@ function cdb_lookup(id,callback) {
 
 //  alert("find " + id);
   local_db.find({
-    selector: {ref_gid: id},
+    selector: {gae_ds_kind: "Student", ref_gid: id},
 //    fields: ['_id', 'name'],
 //    sort: ['name']
   }).then(function (result) {
@@ -227,111 +242,15 @@ document.getElementById("btn_cdb_sync_cancel").onclick = function() {
         replication.cancel();	
 }; 
 
-//////////////////////////////////////////////////////////////
-// fill select boxes
-function fill_season_list() {
-  var select=document.getElementById("selectSeason")
-  local_db.find({
-    selector: {gae_ds_kind: "Season"},
-  }).then(function (result) {
-    console.log(result);
-    for(var i = 0; i < result.docs.length; i++) {
-      s = result.docs[i]
-      var el = document.createElement("option");
-      el.textContent = s.name;
-      el.value = s._id;
-      select.appendChild(el);
-    }
-  }).catch(function (err) {
-    alert("find err");
-    console.log(err);
-  });
-}
 
-function fill_folder_list() {
-  var select=document.getElementById("selectFolder")
-  local_db.find({
-    selector: {gae_ds_kind: "Folder"},
-  }).then(function (result) {
-    console.log(result);
-    for(var i = 0; i < result.docs.length; i++) {
-      s = result.docs[i]
-      var el = document.createElement("option");
-      el.textContent = s.name;
-      el.value = s._id;
-      select.appendChild(el);
-    }
-  }).catch(function (err) {
-    alert("find err");
-    console.log(err);
-  });
-}
+COURSE_SELECTOR = require("./course_selector.js");
 
-fill_season_list();
-fill_folder_list();
-
-
-function removeOptions(selectbox)
-{
-    var i;
-    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
-    {
-        selectbox.remove(i);
-    }
-}
-
-function removeLists(list_elem) {
-  while( list_elem.firstChild ){
-    list_elem.removeChild( list_elem.firstChild );
-  }
-}
-
-function getOption(selectbox) {
-  return selectbox.options[selectbox.selectedIndex].value;
-}
-
-function refill_course_list() {
-  var sf = document.getElementById("selectFolder");
-  var folder_key = sf.options[sf.selectedIndex].value;
-  var ss = document.getElementById("selectSeason");
-  var season_key = ss.options[ss.selectedIndex].value;
-
-  select =  document.getElementById("selectCourse");
-  removeOptions(select);
-
-  local_db.find({
-    selector: {gae_ds_kind: "Course", season_key: season_key, folder_key: folder_key},
-  }).then(function (result) {
-    console.log(result);
-    for(var i = 0; i < result.docs.length; i++) {
-      s = result.docs[i]
-      var el = document.createElement("option");
-      el.textContent = s.code;
-      el.value = s._id;
-      select.appendChild(el);
-    }
-  }).catch(function (err) {
-    alert("find err");
-    console.log(err);
-  });
-
-
-}
-
-document.getElementById("selectFolder").addEventListener("change",refill_course_list);
-document.getElementById("selectSeason").addEventListener("change",refill_course_list);
-
-
-function refresh_course_lists() {
-      removeLists(document.getElementById("courseList"));
-
-}
-
+COURSE_SELECTOR.init(local_db);
 
 
 document.getElementById("btn_set_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=getOption(document.getElementById("selectCourse"))
+  var course_key=COURSE_SELECTOR.course_key;
   cdb_get_course(course_key,function(course){
     pdb_setup_course(course,function(res){
       alert(res);
@@ -342,7 +261,7 @@ document.getElementById("btn_set_course").onclick = function(ev) {
 
 document.getElementById("btn_add_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=getOption(document.getElementById("selectCourse"))
+  var course_key=COURSE_SELECTOR.course_key;
   cdb_get_course(course_key,function(course){
    // alert(course.code);
   });
@@ -350,7 +269,7 @@ document.getElementById("btn_add_course").onclick = function(ev) {
 
 document.getElementById("btn_add_m_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=getOption(document.getElementById("selectCourse"))
+  var course_key=COURSE_SELECTOR.course_key;
   cdb_get_course(course_key,function(course){
    // alert(course.code);
   });
@@ -467,6 +386,9 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
       d = unpack_json(val.split("\*")[2]);      
       //console.log(d);
       ref_gid = d.id;
+      cdb_lookup(ref_gid,function(s){
+        alert(s);
+      });
       SCAN_RESULT.show_ok_male(d.name);
     }
   } else if (val.startsWith("TS_CMD*")) {
