@@ -155,6 +155,9 @@
      XX:XX:XX
      </div>
      <div>
+       celkem:<span id="presence_stats_total"></span>, kluku:<span id="presence_stats_male"></span>, holek: <span id="presence_stats_female"></span>
+     </div>
+     <div>
        vsichni z
        <ul id="courseList" class="list-inline">
         <li>C1</li>
@@ -507,7 +510,6 @@ var SCAN_RESULT = (function() {
   </script>
 
  <script>
-
   function pad(n, width, z) {
     z = z || '0';
     n = n + '';
@@ -523,6 +525,17 @@ var SCAN_RESULT = (function() {
   }
   window.setInterval(update_clock,1000);
  </script>
+
+  <script>
+   function show_presence_stats(total,male,female) {
+      document.getElementById("presence_stats_total").innerText=total.toString();
+      document.getElementById("presence_stats_male").innerText=male.toString();
+      document.getElementById("presence_stats_female").innerText=female.toString();
+   }
+   function clear_presence_stats() {
+      show_presence_stats(0,0,0);
+   }
+  </script>
 
   <script>
    function calc_resize() {

@@ -410,7 +410,8 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
             } else {
               SCAN_RESULT.show_ok_female(r.name);
             }
-            console.log(PRESENCE.get_stats());
+            ps = PRESENCE.get_stats();
+            show_presence_stats(ps.total,ps.m,ps.f);
           } else if (r.dupl) {
             delay = Date.now () - r.dupl_time;
             if (r.male) {
@@ -444,5 +445,7 @@ SCAN_RESULT.show_ready();
 
 PRESENCE = require("./presence.js");
 PRESENCE.init();
+clear_presence_stats();
+
 
 
