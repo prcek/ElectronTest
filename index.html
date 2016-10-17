@@ -144,6 +144,7 @@
         <button id="btn_set_course" class="btn btn-danger ">setup</button>
         <button id="btn_add_course" class="btn btn-danger ">add</button>
         <button id="btn_add_m_course" class="btn btn-danger ">add m</button>
+        <button id="btn_add_ah_course" class="btn btn-danger ">add auto host m</button>
       </div>
       </form>
     </div>
@@ -157,20 +158,9 @@
      <div>
        celkem:<span id="presence_stats_total"></span>, kluku:<span id="presence_stats_male"></span>, holek: <span id="presence_stats_female"></span>
      </div>
-     <div>
-       vsichni z
-       <ul id="courseList" class="list-inline">
-        <li>C1</li>
-        <li>C2</li>
-       </ul>
-      </div>
-      <div>
-       jen kluci z
-       <ul id="courseMList" class="list-inline">
-        <li>C1</li>
-        <li>C2</li>
-       </ul>
-       </div>
+     <div id="presence_filter">
+     &nbsp;
+     </div>
      </div>
      <div class="col-xs-8 vhcenter">
       <div id="scn_anim_div" class="flash_border"> 
@@ -204,7 +194,41 @@
 
 
   </div> <!-- end of main .container-fluid -->
+
+
+  <div style="display:none">
+   <div id="tpl_course" type="x-tmpl-mustache">
+     <div> Kurz:
+       <ul>
+         {{#courses}} 
+         <li>{{code}} - {{card_line_1}}</li>
+         {{/courses}}
+       </ul>
+     </div>
+     <div> 
+      Pánové z kurzů:
+      <div>
+         {{#courses_hm}} 
+         <span>{{code}}</span>
+         {{/courses_hm}}
+      </div>
+     </div>
+   </div>
+  </div>
+
+
   </body>
+
+  <script>
+    var Mustache = require("mustache");
+    function render_template(id,data) {
+      el = document.getElementById(id);
+      if (el) {
+          return Mustache.render(el.innerHTML,data);
+      } 
+      return null;
+    }
+  </script>
 
   <script>
     function sys_status_online() {

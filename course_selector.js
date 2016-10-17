@@ -93,7 +93,6 @@ function fill_course_list(ondone) {
   local_db.find({
     selector: {gae_ds_kind: "Course", season_key: current_season_key, folder_key: current_folder_key},
   }).then(function (result) {
-    console.log(result);
     for(var i = 0; i < result.docs.length; i++) {
       s = result.docs[i]
       var el = document.createElement("option");
@@ -142,9 +141,11 @@ function init(db) {
 		document.getElementById("selectCourse").addEventListener("change",course_changed);
 	});
 }
-
+function get_ck() {
+	return current_course_key;
+}
 
 module.exports = {
   init: init,
-  course_key: current_course_key,
+  get_ck: get_ck,
 };

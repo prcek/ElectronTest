@@ -101,72 +101,30 @@ local_db.createIndex({
   console.log(err);
 });
 
-//var access_courses = []
-//var access_courses_m = []
 
-
-let current_course;
-function pdb_setup_course(course,callback) {
-  if (current_course) {
-    if (current_course._id != course._id) {
-      current_course = course
-      pdb_reset(function(res){
-        console.log(res);
-        callback("ok - swap")
-      })
-    } else {
-
-      //pdb_reset(function(res){
-      //  console.log(res);
-        callback("ok - same")
-      //})
-
-    }
-  } else {
-    current_course = course;
-    callback("ok - first");
-  }
-}
-
-
-
-function pdb_reset(callback) {
-  present_db.destroy().then(function(res) {
-    present_db = new PouchDB('present');
-    present_db.info(callback);
-  })
-}
-
-
-function pdb_put_student(student,callback) {
-  if ((current_course) && (student.course_key !=current_course._id)) {
-    callback("wrong course");
-  } else {
-    present_db.put({_id: student._id, data: student}).then(function(res){
-      console.log(res);
-      callback("ok")
-    }).catch(function(err){
-      console.log(err);
-      if (err.status == 409) {
-        callback("duplicate")
-      } else {
-        callback("err")
-      }
-    })
-  }
-}
-
-function pdb_get_stats(callback) {
-
-}
 
 function cdb_get_course(id, callback) {
   local_db.get(id).then(function (res) {
-    console.log(res)
     callback(res)
   })
 }
 
+function cdb_get_course_sib(id,callback) {
+  cdb_get_course(id,function(c){
+    var fk = c.folder_key;
+    var sk = c.season_key;
+
+    local_db.find({
+      selector: {gae_ds_kind: "Course", season_key: sk, folder_key: fk},
+    }).then(function (result) {
+      for(var i = 0; i < result.docs.length; i++) {
+        s = result.docs[i]
+        console.log(s)
+      }
+      callback(result.docs)
+    });
+  })
+}
 
 function cdb_lookup(id,callback) {
   document.getElementById("decode_out").innerText = "..."
@@ -248,34 +206,52 @@ COURSE_SELECTOR = require("./course_selector.js");
 COURSE_SELECTOR.init(local_db);
 
 
+function update_presence_filter() {
+  var x = PRESENCE.get_course_lists();
+  var h = render_template("tpl_course",x);
+  el = document.getElementById("presence_filter").innerHTML = h;
+}
+
 document.getElementById("btn_set_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=COURSE_SELECTOR.course_key;
+  var course_key=COURSE_SELECTOR.get_ck();
   cdb_get_course(course_key,function(course){
-    pdb_setup_course(course,function(res){
-      alert(res);
-      refresh_course_lists()
-    });
+    PRESENCE.init();
+    PRESENCE.add_course(course);
+    clear_presence_stats();
+    update_presence_filter();
   });
 }; 
 
 document.getElementById("btn_add_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=COURSE_SELECTOR.course_key;
+  var course_key=COURSE_SELECTOR.get_ck();
   cdb_get_course(course_key,function(course){
-   // alert(course.code);
+    PRESENCE.add_course(course);
+    update_presence_filter();
   });
 }; 
 
 document.getElementById("btn_add_m_course").onclick = function(ev) {
   ev.preventDefault(); 
-  var course_key=COURSE_SELECTOR.course_key;
+  var course_key=COURSE_SELECTOR.get_ck();
   cdb_get_course(course_key,function(course){
-   // alert(course.code);
+    PRESENCE.add_course_hm(course);
+    update_presence_filter();
   });
 }; 
 
 
+document.getElementById("btn_add_ah_course").onclick = function(ev) {
+  ev.preventDefault(); 
+  var course_key=COURSE_SELECTOR.get_ck();
+  cdb_get_course_sib(course_key,function(courses){
+      for(var i = 0; i < courses.length; i++) {
+        PRESENCE.add_course_hm(courses[i])
+      }
+      update_presence_filter();
+  });
+}; 
 
 
 function set_test_value(ev) {
@@ -419,6 +395,8 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
             } else {
                 SCAN_RESULT.show_dupl_female(r.name + "(před " + timedformat(delay) + ")");
             }
+          } else if (r.diff) {
+            SCAN_RESULT.show_error(r.name + " - jiný kurz.")
           } else {
             SCAN_RESULT.show_error("Neznámá chyba.")
           }
