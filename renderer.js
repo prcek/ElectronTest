@@ -179,7 +179,7 @@ function cdb_lookup(id,callback) {
   }).then(function (result) {
    // alert("find ok");
     console.log(result);
-    callback(result);
+    callback(result.docs[0]);
   }).catch(function (err) {
     alert("find err");
     console.log(err);
@@ -340,6 +340,9 @@ function cdb_show_res(res) {
 
 
 
+
+
+
 document.getElementById("decode_input").oninput = function () {
   SCAN_RESULT.flash()
 }
@@ -373,6 +376,15 @@ function unpack_json(val) {
   return JSON.parse(strData);
 }
 
+function timedformat(time) {
+  time = time /(1000);
+  if (time < 120) {
+    return Math.round(time) + " sec";
+  }
+  time = time /60;
+  return Math.round(time)+" min";
+}
+
 document.getElementById("qrcode_form").onsubmit = function(ev) {
   ev.preventDefault(); 
   val = document.getElementById("decode_input").value;
@@ -387,9 +399,30 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
       //console.log(d);
       ref_gid = d.id;
       cdb_lookup(ref_gid,function(s){
-        alert(s);
+        if (s == null) {
+          SCAN_RESULT.show_error("Neznámý žák!");
+        } else { 
+          r = PRESENCE.try_attend(s);   
+          console.log(r);
+          if (r.ok) {  
+            if (r.male) {
+              SCAN_RESULT.show_ok_male(r.name);
+            } else {
+              SCAN_RESULT.show_ok_female(r.name);
+            }
+            console.log(PRESENCE.get_stats());
+          } else if (r.dupl) {
+            delay = Date.now () - r.dupl_time;
+            if (r.male) {
+                SCAN_RESULT.show_dupl_male(r.name + "(před " + timedformat(delay) + ")");
+            } else {
+                SCAN_RESULT.show_dupl_female(r.name + "(před " + timedformat(delay) + ")");
+            }
+          } else {
+            SCAN_RESULT.show_error("Neznámá chyba.")
+          }
+        }
       });
-      SCAN_RESULT.show_ok_male(d.name);
     }
   } else if (val.startsWith("TS_CMD*")) {
     if (!check_tscmd_crc(val)) {
@@ -408,5 +441,8 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
 //////////////////////////////
 
 SCAN_RESULT.show_ready();
+
+PRESENCE = require("./presence.js");
+PRESENCE.init();
 
 
