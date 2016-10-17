@@ -151,6 +151,9 @@
 
     <div id="mainbar" class="row main">  <!-- main row -->
      <div class="col-xs-4 main">
+     <div id="clock">
+     XX:XX:XX
+     </div>
      <div>
        vsichni z
        <ul id="courseList" class="list-inline">
@@ -502,6 +505,24 @@ var SCAN_RESULT = (function() {
   	window.addEventListener('offline',  alertOnlineStatus)
   	alertOnlineStatus()
   </script>
+
+ <script>
+
+  function pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
+  function update_clock() {
+      var date = new Date();
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var seconds = date.getSeconds();
+      var s = pad(hours,2) + ":" + pad(minutes,2) + ":" + pad(seconds,2);
+      document.getElementById("clock").innerText=s;
+  }
+  window.setInterval(update_clock,1000);
+ </script>
 
   <script>
    function calc_resize() {
