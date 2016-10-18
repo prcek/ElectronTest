@@ -1,7 +1,7 @@
 {
-  "name": "electron-quick-start",
+  "name": "ts-starlet-qr-presence-checker",
   "version": "1.1.1",
-  "description": "A minimal Electron application",
+  "description": "QR presence checker",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
