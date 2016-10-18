@@ -42,6 +42,21 @@ document.getElementById("btn_shutdown").onclick = function() {
   ipcRenderer.send('shutdown');
 }; 
 
+document.getElementById("btn_open_set").onclick = function() {
+  sb = document.getElementById("manual_setbar");
+  if (sb.style.display=="none") {
+    sb.style.display=null;
+  } else {
+    sb.style.display="none";
+  }
+}; 
+function hide_manual_setbar() {
+  sb = document.getElementById("manual_setbar");
+  sb.style.display="none";
+}
+hide_manual_setbar();
+
+
 
 //////////////////////////////////////////////////////////////
 // open local db
@@ -139,7 +154,7 @@ function cdb_get_course_sib(id,callback) {
 }
 
 function cdb_lookup(id,callback) {
-  document.getElementById("decode_out").innerText = "..."
+ // document.getElementById("decode_out").innerText = "..."
 
 //  alert("find " + id);
   local_db.find({
@@ -284,6 +299,7 @@ document.getElementById("btn_set_course").onclick = function(ev) {
     clear_presence_stats();
     update_presence_filter();
   });
+  hide_manual_setbar();
 }; 
 
 document.getElementById("btn_add_course").onclick = function(ev) {
@@ -293,6 +309,7 @@ document.getElementById("btn_add_course").onclick = function(ev) {
     PRESENCE.add_course(course);
     update_presence_filter();
   });
+  hide_manual_setbar();
 }; 
 
 document.getElementById("btn_add_m_course").onclick = function(ev) {
@@ -302,18 +319,25 @@ document.getElementById("btn_add_m_course").onclick = function(ev) {
     PRESENCE.add_course_hm(course);
     update_presence_filter();
   });
+  hide_manual_setbar();
 }; 
 
 
-document.getElementById("btn_add_ah_course").onclick = function(ev) {
+document.getElementById("btn_set_ah_course").onclick = function(ev) {
   ev.preventDefault(); 
   var course_key=COURSE_SELECTOR.get_ck();
-  cdb_get_course_sib(course_key,function(courses){
-      for(var i = 0; i < courses.length; i++) {
-        PRESENCE.add_course_hm(courses[i])
-      }
-      update_presence_filter();
+  cdb_get_course(course_key,function(course){
+    PRESENCE.init();
+    PRESENCE.add_course(course);
+    clear_presence_stats();
+    cdb_get_course_sib(course_key,function(courses){
+        for(var i = 0; i < courses.length; i++) {
+          PRESENCE.add_course_hm(courses[i])
+        }
+        update_presence_filter();
+    });
   });
+  hide_manual_setbar();
 }; 
 
 
@@ -380,7 +404,7 @@ window.setInterval(hold_focus,1000);
 //// END of hold focus
 
 
-
+/*
 function cdb_show_res(res) {
   if (res.docs.length != 1) {
     document.getElementById("decode_out").innerText ="CDB: NOT FOUND";
@@ -393,7 +417,7 @@ function cdb_show_res(res) {
   })
 
 }
-
+*/
 
 
 
@@ -570,5 +594,8 @@ PRESENCE = require("./presence.js");
 PRESENCE.init();
 clear_presence_stats();
 
-
+///////////////////////////////
+if (ipcRenderer.sendSync('get_config', 'debug')) {
+  document.getElementById("debugbar").style.display=null;
+}
 

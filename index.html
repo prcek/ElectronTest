@@ -11,14 +11,19 @@
     <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="node_modules/font-awesome/css/font-awesome.css" rel="stylesheet">
     <style>
-      body { margin-top: 5px; height: 100%; }
-      div.main { height: 300px; }
+      body { margin-top: 5px; height: 100%; background-color: #000000; color: #f0f0f0; }
+      #sys_bar {
+        padding: 10px;
+      }
+      
+      div.main { height: 500px; }
       div.vhcenter { 
         position:relative;
         top:50%;
         transform: translateY(-50%);
         text-align: center;
-       }
+      }
+
       .bigfont {
         font-size: 8em;
       }
@@ -31,12 +36,14 @@
       .greenbg {
         background-color: green;
       }
-      .topbg {
-        background-color: #eeeeee;
-      }
+
       .splitbg {
         background-color: #555555;
+        height: 5px;
+        margin-top: 5px;
+        margin-bottom: 5px;
       }
+
       .bottombg {
         background-color: #eeeeee;
       }
@@ -63,106 +70,104 @@
 
   <div class="container-fluid">
   
-    <div id="topbar" class="row topbg">  <!-- (status, cfg) row --> 
+    <div id="sys_bar" class="row">  <!-- (status, cfg) row --> 
 
-      <div class="col-xs-4">
-      	Node <script>document.write(process.versions.node)</script>,
-      	Chromium <script>document.write(process.versions.chrome)</script>,
-  	    Electron <script>document.write(process.versions.electron)</script>,
-  	    PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script><br/>
-      </div> <!-- end of col status -->    
+      <div class="col-xs-8">
 
-      <div class="col-xs-4"> 
-        <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Nastaveni</button>
-        <button id="btn_change_fsmode" type="button" class="btn btn-default btn-xs">Fullscreen</button>
-        <button id="btn_enable_debug" type="button" class="btn btn-default btn-xs">Debug</button>
-        <button id="btn_shutdown" type="button" class="btn btn-default btn-xs">Vypnout</button>
-      </div> <!-- end of col sync -->    
-
-      <div class="col-xs-3"> 
-          <div>
-            <i id="sys_status_icon_remotedb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_remotedb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_remoteupdb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_remoteupdb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_syncdb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_syncdb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_syncupdb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_syncupdb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_localdb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_localdb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_localupdb" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_localupdb">?</span>
-          </div>
-
-          <div>
-            <i id="sys_status_icon_localdb_ia" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_localdb_ia">?</span>
-          </div>
-          <div>
-            <i id="sys_status_icon_localdb_ib" class="fa fa-question" aria-hidden="true"></i>
-            <span id="sys_status_text_localdb_ib">?</span>
-          </div>
-
-          <div>
+          <span>
             <i id="sys_status_icon_online" class="fa fa-question" aria-hidden="true"></i>
             <span id="sys_status_text_online">?</span>
-          </div>
-      </div> <!-- end of col cdb status -->    
+          </span>
 
-      <div class="col-xs-1">
-        <span class="fa-stack fa-2x">
-          <i class="fa fa-male fa-stack-1x "></i>
-          <i class="fa fa-ban fa-stack-2x text-danger"></i>
+          <span>
+            <i id="sys_status_icon_remotedb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_remotedb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_remoteupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_remoteupdb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_syncdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_syncdb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_syncupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_syncupdb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_localdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_localupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localupdb">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_localdb_ia" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb_ia">?</span>
+          </span>
+
+          <span>
+            <i id="sys_status_icon_localdb_ib" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localdb_ib">?</span>
+          </span>
+
+
+      </div>   
+      <div class="col-xs-4">
+        <span class="pull-right">
+        <button id="btn_open_set" type="button" class="btn btn-default btn-xs">Manuální volba kurzu</button>
+        <button id="btn_change_fsmode" type="button" class="btn btn-default btn-xs">Fullscreen</button>
+        <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Konfigurace</button>
+        <button id="btn_enable_debug" type="button" class="btn btn-default btn-xs">Debug</button>
+        <button id="btn_shutdown" type="button" class="btn btn-danger btn-xs">Vypnout</button>
         </span>
-      </div>  
+      </div>   
 
-    </div>  <!-- end of (status, cfg) row --> 
-    <div class="row splitbg">&nbsp;</div>
-    <div id="setbar" class="row">  <!-- (status, cfg) row --> 
+    </div> <!-- end of sysbar -->
+ 
+
+    <div id="manual_setbar"> <!-- (status, cfg) row --> 
+
+    <div class="row">
       <form>
       <div class="col-xs-2">
         <div class="form-group">
-          <select id="selectSeason" class="form-control">
+          <select id="selectSeason" class="form-control input-xs">
           </select>
         </div>
       </div>
       <div class="col-xs-4">
         <div class="form-group">
-          <select id="selectFolder" class="form-control">
+          <select id="selectFolder" class="form-control input-xs">
           </select>
         </div>
       </div>
       <div class="col-xs-2">
         <div class="form-group">
-          <select id="selectCourse" class="form-control">
+          <select id="selectCourse" class="form-control input-xs">
           </select>
         </div>
       </div>
-      <div class="col-xs-4">
-        <button id="btn_set_course" class="btn btn-danger ">setup</button>
-        <button id="btn_add_course" class="btn btn-danger ">add</button>
-        <button id="btn_add_m_course" class="btn btn-danger ">add m</button>
-        <button id="btn_add_ah_course" class="btn btn-danger ">add auto host m</button>
-      </div>
       </form>
     </div>
-    <div class="row splitbg">&nbsp;</div>
+    <div class="row">
+      <div class="col-xs-12">
+        <button id="btn_set_ah_course" class="btn btn-danger ">zvolit kurz</button>
+        <button id="btn_set_course" class="btn btn-danger ">zvolit kurz bez hostování kluků</button>
+        <button id="btn_add_course" class="btn btn-danger ">přidat další kurz</button>
+        <button id="btn_add_m_course" class="btn btn-danger ">přidat další hostující kluky z kurzu</button>
+      </div>
+    </div>
+    </div>
+    <div class="row splitbg"></div>
 
     <div id="mainbar" class="row main">  <!-- main row -->
      <div class="col-xs-4 main">
@@ -189,22 +194,24 @@
     </div> <!-- end of main row -->
 
 
-    <div class="row splitbg">&nbsp;</div>
-    <div id="bottombar" class="row bottombg"> <!-- scan row -->
+    <div class="row splitbg"></div>
+    <div id="bottombar" class="row"> <!-- scan row -->
         <div class="col-xs-12">
     	     <form id="qrcode_form">
             	<div class="form-group">
                       <input type="text" class="form-control" id="decode_input" placeholder="qrcode value">
             	</div>
         		</form>
-            <div id="decode_out"></div>
+        </div>
+    </div> <!-- end of scan row -->
+
+    <div id="debugbar" class="row" style="display:none;"> 
             <button id="btn_test_code1" class="btn btn-xs" value="TS*47707*eJyrViouLcpLzE1VslJQikosyEktScxR0lFQgol5JWaXJoEEilMTi/PzQEJGBoYG+oaGEMEKkEguiJ2cX1pUDNYDlipLLQKxQ4LBvMwUIMfE3NzAvBYAfNMeyA==*3370528772*1972071602**">TS*47707</button>
             <button id="btn_test_code2" class="btn btn-xs" value="TS_CMD*eJyrVkrOLy0qTo3PTFGyUlBKTC+oSssLqvKJKMhIds+pSs7w9XFNj3JJMg6rTDYKjUz3dHa08I13qUpP91XSUYBpzkvMTQVpr4opNTBINczOSUzJAzNTFIpLgAxDU8vUlHwQw8wwOz+nOBssaalQkpiXChI1gClHMjM5PwVsphFIrCy1CMQOCTYE8SBudY4Pdg0JDVCqBQAw3T4N*685749921**">TS_CMD</button>
             <button id="btn_test_code3" class="btn btn-xs" value="TS*48918*eJyrViouLcpLzE1VslJQiik1MDRITk3OUNJRUIIJeiUW5RfnJJaBxIpTE4vz80CiRkCV+oaGEMEKkEguiJ2cX1pUDNbmC5YrSy0CcUKCwbzMFCDHxMLS0KIWABX3ICc=*807235956*2368961548**">TS*48918</button>
             <button id="btn_test_code4" class="btn btn-xs" value="TS*47856*eJyrViouLcpLzE1VslJQckotSk8tyi+LKTUwSDVU0lFQgskEJ+alFCWCRIpTE4vz80BiRgaGBvqGhhDBCpBIGoidnF9aVAzW5AuWK0stAnFCgsG8zBQgx8TcwtSsFgCnriFF*2639184370*2339792050**">TS*47856</button>
-        </div>
-    </div> <!-- end of scan row -->
 
+    </div>
 
 
   </div> <!-- end of main .container-fluid -->

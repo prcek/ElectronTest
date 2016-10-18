@@ -37,6 +37,13 @@
   	</div>
     </form>
     <button id="close-btn" class="btn btn-default btn-xs">close &amp; save</button>
+    <h1>Versions</h1>
+      <div>
+        Node <script>document.write(process.versions.node)</script>,
+        Chromium <script>document.write(process.versions.chrome)</script>,
+        Electron <script>document.write(process.versions.electron)</script>,
+        PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script>
+      </div>   
   </body>
 
   <script>

@@ -17,7 +17,7 @@ console.log("config file: " + config.file());
 console.log(config.all());
 
 ipcMain.on('get_config', (event, name) => {
-  console.log("get_config "+name); 
+  //console.log("get_config "+name); 
   event.returnValue = config.get(name,""); 
 })
 
@@ -28,7 +28,7 @@ ipcMain.on('set_config', (event, name, value) => {
 }) 
 
 ipcMain.on('open_config_dialog', (event) => {
-  console.log("open_config ");
+  //console.log("open_config ");
 
   let child = new BrowserWindow({parent: mainWindow, modal: true, show: true})
   child.loadURL(`file://${__dirname}/config.html`)
