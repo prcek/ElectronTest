@@ -50,7 +50,10 @@ ipcMain.on('shutdown', (event) => {
 
 function createMainWindow () {
   console.log("createMainWindow");
-  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreenable:true, autoHideMenuBar: true})
+
+  autofs=config.get("autofs",false);
+
+  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreenable:true, fullscreen:autofs, autoHideMenuBar: true, backgroundColor:'#000000'})
   
 
   mainWindow.loadURL(`file://${__dirname}/index.html`)
