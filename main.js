@@ -34,12 +34,23 @@ ipcMain.on('open_config_dialog', (event) => {
   child.loadURL(`file://${__dirname}/config.html`)
 })
 
+ipcMain.on('change_fsmode', (event) => {
+  console.log("change_fsmode");
+  mainWindow.setFullScreen(!mainWindow.isFullScreen());
+});
 
+ipcMain.on('enable_debug', (event) => {
+  mainWindow.webContents.openDevTools()
+}); 
+
+ipcMain.on('shutdown', (event) => {
+  app.quit();
+}); 
 
 
 function createMainWindow () {
   console.log("createMainWindow");
-  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreen: false, autoHideMenuBar: true})
+  mainWindow = new BrowserWindow({width: 800, height: 600, fullscreenable:true, autoHideMenuBar: true})
   
 
   mainWindow.loadURL(`file://${__dirname}/index.html`)

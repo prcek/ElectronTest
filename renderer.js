@@ -30,6 +30,17 @@ document.getElementById("btn_open_cfg").onclick = function() {
 	ipcRenderer.send('open_config_dialog')
 }; 
 //////////////////////////////////////////////////////////////
+document.getElementById("btn_change_fsmode").onclick = function() {
+  ipcRenderer.send('change_fsmode');
+}; 
+
+document.getElementById("btn_enable_debug").onclick = function() {
+  ipcRenderer.send('enable_debug');
+}; 
+
+document.getElementById("btn_shutdown").onclick = function() {
+  ipcRenderer.send('shutdown');
+}; 
 
 
 //////////////////////////////////////////////////////////////
@@ -41,9 +52,6 @@ var local_db = new PouchDB('cdb_local');
 var local_updb = new PouchDB('upcdb_local')
 
 
-function cdb_log(x) {
-    document.getElementById("cdb_status").innerText +=  " " + x;
-}
 
 
 local_db.info().then(function (result){

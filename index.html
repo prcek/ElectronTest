@@ -66,18 +66,17 @@
     <div id="topbar" class="row topbg">  <!-- (status, cfg) row --> 
 
       <div class="col-xs-4">
-      	We are using node <script>document.write(process.versions.node)</script>,
+      	Node <script>document.write(process.versions.node)</script>,
       	Chromium <script>document.write(process.versions.chrome)</script>,
   	    Electron <script>document.write(process.versions.electron)</script>,
   	    PouchDB <script>var pouchDB = require('prcek_pouchdb'); document.write(pouchDB.version); </script><br/>
-        <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Setup cfg</button>
       </div> <!-- end of col status -->    
 
       <div class="col-xs-4"> 
-      		<div id="cdb_status"></div>
-      	  <div>Internet is <span id="internet_status"></span></div>
-      		<button id="btn_cdb_sync" class="btn btn-danger btn-xs">sync db</button>
-      		<button id="btn_cdb_sync_cancel" class="btn btn-danger btn-xs">sync db cancel</button>
+        <button id="btn_open_cfg" type="button" class="btn btn-default btn-xs">Nastaveni</button>
+        <button id="btn_change_fsmode" type="button" class="btn btn-default btn-xs">Fullscreen</button>
+        <button id="btn_enable_debug" type="button" class="btn btn-default btn-xs">Debug</button>
+        <button id="btn_shutdown" type="button" class="btn btn-default btn-xs">Vypnout</button>
       </div> <!-- end of col sync -->    
 
       <div class="col-xs-3"> 
