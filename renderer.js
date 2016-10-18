@@ -545,7 +545,7 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
             PRESENCE.add_course(c);
             clear_presence_stats();
             update_presence_filter();
-            cdb_get_course_sib(course_key,function(courses){
+            cdb_get_course_sib(d.course_id,function(courses){
               for(var i = 0; i < courses.length; i++) {
                 PRESENCE.add_course_hm(courses[i])
               }
