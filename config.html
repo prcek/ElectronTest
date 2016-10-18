@@ -15,12 +15,25 @@
     <h1>Config</h1>
     <form>
 	<div class="form-group">
+
     		<label for="input_cdb_url">CDB url</label>
     		<input type="url" class="form-control" id="input_cdb_url" placeholder="Url">
-        <label for="input_autofs">Auto fullscreen</label>
+
+        <label for="input_upcdb_url">UpLink CDB url</label>
+        <input type="url" class="form-control" id="input_upcdb_url" placeholder="Url">
+
+        <label for="input_autofs">zapnout ve fullscreen</label>
         <input type="checkbox" class="form-control" id="input_autofs">
+
+        <label for="input_debug">Debug</label>
+        <input type="checkbox" class="form-control" id="input_debug">
+
         <label for="input_scanbox_height">Vyska scan boxu</label>
         <input type="number" class="form-control" id="input_scanbox_height">
+
+        <label for="input_station_name">Jmeno QR stanice</label>
+        <input type="text" class="form-control" id="input_station_name">
+
   	</div>
     </form>
     <button id="close-btn" class="btn btn-default btn-xs">close &amp; save</button>
@@ -34,11 +47,20 @@
 		val = document.getElementById("input_cdb_url").value;
 		ipcRenderer.send("set_config","cdb_url",val);	
 
+    val = document.getElementById("input_upcdb_url").value;
+    ipcRenderer.send("set_config","upcdb_url",val); 
+
     val = document.getElementById("input_autofs").checked;
     ipcRenderer.send("set_config","autofs",val); 
 
+    val = document.getElementById("input_debug").checked;
+    ipcRenderer.send("set_config","debug",val); 
+
     val = document.getElementById("input_scanbox_height").value;
     ipcRenderer.send("set_config","scanbox_height",val); 
+
+    val = document.getElementById("input_station_name").value;
+    ipcRenderer.send("set_config","station_name",val); 
 
 	}
   
@@ -48,14 +70,25 @@
 		console.log("get url " + val);
 		document.getElementById("input_cdb_url").value = val;
 
+    val = ipcRenderer.sendSync('get_config', 'upcdb_url');
+    console.log("get upurl " + val);
+    document.getElementById("input_upcdb_url").value = val;
+
     val = ipcRenderer.sendSync('get_config', 'autofs');
     console.log("get autofs " + val);
     document.getElementById("input_autofs").checked = val;
+
+    val = ipcRenderer.sendSync('get_config', 'debug');
+    console.log("get debug " + val);
+    document.getElementById("input_debug").checked = val;
 
     val = ipcRenderer.sendSync('get_config', 'scanbox_height');
     console.log("get scanbox_height " + val);
     document.getElementById("input_scanbox_height").value = val;
 
+    val = ipcRenderer.sendSync('get_config', 'station_name');
+    console.log("get station_name " + val);
+    document.getElementById("input_station_name").value = val;
 
   }
 	const remote = require('electron').remote;

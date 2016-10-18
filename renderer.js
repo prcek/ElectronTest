@@ -38,9 +38,7 @@ var PouchDB = require('prcek_pouchdb');
 PouchDB.plugin(require('pouchdb-find'));
 
 var local_db = new PouchDB('cdb_local');
-var present_db = new PouchDB('present')
-
-
+var local_updb = new PouchDB('upcdb_local')
 
 
 function cdb_log(x) {
@@ -51,11 +49,17 @@ function cdb_log(x) {
 local_db.info().then(function (result){
    console.log(result);
    sys_status_localdb_ready()
-   //cdb_log("local db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
 }).catch(function (err){
-   //cdb_log("local db err = " + err);
    console.log(err);
    sys_status_localdb_error()
+});
+
+local_updb.info().then(function (result){
+   console.log(result);
+   sys_status_localupdb_ready()
+}).catch(function (err){
+   console.log(err);
+   sys_status_localupdb_error()
 });
 
 
@@ -147,6 +151,11 @@ function cdb_lookup(id,callback) {
 var remote_db_url = ipcRenderer.sendSync('get_config', 'cdb_url');
 var remote_db = new PouchDB(remote_db_url);
 
+var remote_updb_url = ipcRenderer.sendSync('get_config', 'upcdb_url');
+var remote_updb = new PouchDB(remote_updb_url);
+
+
+
 function remotedb_state() {
   remote_db.info().then(function (result){
      console.log(result);
@@ -154,15 +163,37 @@ function remotedb_state() {
      if (!first_sync) {
         cdb_sync();
      }
-     //cdb_log("remote db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
   }).catch(function (err){
      //cdb_log("remote db err = " + err);
-     console.log(err);
+     //console.log(err);
+     console.log("remote_db_state error: "+err);
+
      sys_status_remotedb_error()
   });
 }
 remotedb_state();
 window.setInterval(remotedb_state,60000);
+
+
+function remote_updb_state() {
+  remote_updb.info().then(function (result){
+     console.log(result);
+     sys_status_remoteupdb_ready()
+     if (!up_first_sync) {
+        upcdb_sync();
+     }
+     //cdb_log("remote db = " + result.db_name + " " + result.doc_count + " " + result.update_seq + ";");
+  }).catch(function (err){
+     //cdb_log("remote db err = " + err);
+     console.log("remote_updb_state error: "+err);
+     sys_status_remoteupdb_error()
+  });
+}
+remote_updb_state();
+window.setInterval(remote_updb_state,60000);
+
+
+
 
 var first_sync = false;
 let replication;
@@ -183,22 +214,46 @@ function cdb_sync() {
   sys_status_syncdb_error();
 }); 
 }
+
 remote_db.info().then(function (result){
   cdb_sync();
 })
 
 
+var up_first_sync = false;
+let up_replication;
+sys_status_syncupdb_idle();
+function upcdb_sync() {
+  up_first_sync = true;
+  replication = PouchDB.replicate(local_updb,remote_updb, {live:true, retry:true}).on('change', function (info) {
+  sys_status_syncupdb_tick();
+}).on('paused', function (err) {
+  sys_status_syncupdb_idle();
+}).on('active', function () {
+  sys_status_syncupdb_active();
+}).on('denied', function (err) {
+  sys_status_syncupdb_error();
+}).on('complete', function (info) {
+  sys_status_syncupdb_done();
+}).on('error', function (err) {
+  sys_status_syncupdb_error();
+}); 
+}
 
 
-document.getElementById("btn_cdb_sync").onclick = function() {
-	cdb_log("sync start");
-	cdb_sync();	
-}; 
+remote_updb.info().then(function (result){
+  upcdb_sync();
+})
 
-document.getElementById("btn_cdb_sync_cancel").onclick = function() {
-	cdb_log("sync cancel");
-        replication.cancel();	
-}; 
+
+function updb_store_new_presence(doc) {
+  local_updb.post(doc).then(function (response) {
+    console.log(response);
+  }).catch(function (err) {
+    console.log("local_updb_post error: " +err);
+  });
+}
+
 
 
 COURSE_SELECTOR = require("./course_selector.js");
@@ -378,22 +433,30 @@ function timedformat(time) {
   return Math.round(time)+" min";
 }
 
+var UUID = require('node-uuid'); 
+var STATION_NAME = ipcRenderer.sendSync('get_config', 'station_name');
+
 document.getElementById("qrcode_form").onsubmit = function(ev) {
   ev.preventDefault(); 
   val = document.getElementById("decode_input").value;
   document.getElementById("decode_input").value = "";
   //console.log(val);
+  ses = { "ts": Date.now(), "id": UUID.v4(), "station_name": STATION_NAME};
+  updb_store_new_presence({"type":"raw_scan", "data":val, "session": ses});
 
   if (val.startsWith("TS*")) {
     if (!check_ts_crc(val)) {
       SCAN_RESULT.show_error("Neplatný ochraný kód.");
+      updb_store_new_presence({"type":"res", "data":"invalid_checksum", "session": ses});
     } else {
       d = unpack_json(val.split("\*")[2]);      
       //console.log(d);
       ref_gid = d.id;
+      updb_store_new_presence({"type":"decoded_ts", "data":ref_gid, "fulldata": d, "session": ses});
       cdb_lookup(ref_gid,function(s){
         if (s == null) {
           SCAN_RESULT.show_error("Neznámý žák!");
+          updb_store_new_presence({"type":"res", "data":"wrong_student", "session": ses});
         } else { 
           r = PRESENCE.try_attend(s);   
           console.log(r);
@@ -405,6 +468,7 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
             }
             ps = PRESENCE.get_stats();
             show_presence_stats(ps.total,ps.m,ps.f);
+            updb_store_new_presence({"type":"res", "data":"ok","presence":r, "session": ses});
           } else if (r.dupl) {
             delay = Date.now () - r.dupl_time;
             if (r.male) {
@@ -412,10 +476,13 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
             } else {
                 SCAN_RESULT.show_dupl_female(r.name + "(před " + timedformat(delay) + ")");
             }
+            updb_store_new_presence({"type":"res", "data":"dupl","presence":r, "session": ses});
           } else if (r.diff) {
             SCAN_RESULT.show_error(r.name + " - jiný kurz.")
+            updb_store_new_presence({"type":"res", "data":"diff","presence":r, "session": ses});
           } else {
             SCAN_RESULT.show_error("Neznámá chyba.")
+            updb_store_new_presence({"type":"res", "data":"unknow","presence":r, "session": ses});
           }
         }
       });
@@ -423,8 +490,10 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
   } else if (val.startsWith("TS_CMD*")) {
     if (!check_tscmd_crc(val)) {
       SCAN_RESULT.show_error("Neplatný ochraný kód.");
+      updb_store_new_presence({"type":"res", "data":"invalid_checksum", "session": ses});
     } else {
       d = unpack_json(val.split("\*")[1]);
+      updb_store_new_presence({"type":"decoded_tscmd", "data":d.id, "fulldata": d, "session": ses});
       if (d.id == "C_SETUP") {
         cdb_get_course(d.course_id,function(c){
           if (c) {

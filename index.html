@@ -87,13 +87,28 @@
           </div>
 
           <div>
+            <i id="sys_status_icon_remoteupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_remoteupdb">?</span>
+          </div>
+
+          <div>
             <i id="sys_status_icon_syncdb" class="fa fa-question" aria-hidden="true"></i>
             <span id="sys_status_text_syncdb">?</span>
           </div>
 
           <div>
+            <i id="sys_status_icon_syncupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_syncupdb">?</span>
+          </div>
+
+          <div>
             <i id="sys_status_icon_localdb" class="fa fa-question" aria-hidden="true"></i>
             <span id="sys_status_text_localdb">?</span>
+          </div>
+
+          <div>
+            <i id="sys_status_icon_localupdb" class="fa fa-question" aria-hidden="true"></i>
+            <span id="sys_status_text_localupdb">?</span>
           </div>
 
           <div>
@@ -248,6 +263,16 @@
            document.getElementById("sys_status_icon_localdb").className = 'fa fa-database text-danger'
     }
 
+    function sys_status_localupdb_ready() {
+           document.getElementById("sys_status_text_localupdb").innerText ='lupdb ready'
+           document.getElementById("sys_status_icon_localupdb").className = 'fa fa-database text-success'
+    }
+    function sys_status_localupdb_error() {
+           document.getElementById("sys_status_text_localupdb").innerText ='lupdb error'
+           document.getElementById("sys_status_icon_localupdb").className = 'fa fa-database text-danger'
+    }
+
+
     function sys_status_localdb_index_A_indexing() {
            document.getElementById("sys_status_text_localdb_ia").innerText ='idx A indexing'
            document.getElementById("sys_status_icon_localdb_ia").className = 'fa fa-database text-warning'
@@ -276,6 +301,16 @@
            document.getElementById("sys_status_text_remotedb").innerText ='rdb error'
            document.getElementById("sys_status_icon_remotedb").className = 'fa fa-database text-danger'
     }
+
+    function sys_status_remoteupdb_ready() {
+           document.getElementById("sys_status_text_remoteupdb").innerText ='rupdb ready'
+           document.getElementById("sys_status_icon_remoteupdb").className = 'fa fa-database text-success'
+    }
+    function sys_status_remoteupdb_error() {
+           document.getElementById("sys_status_text_remoteupdb").innerText ='rupdb error'
+           document.getElementById("sys_status_icon_remoteupdb").className = 'fa fa-database text-danger'
+    }
+
     function sys_status_syncdb_idle() {
            document.getElementById("sys_status_text_syncdb").innerText ='idle'
            document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh text-success'
@@ -296,6 +331,29 @@
            document.getElementById("sys_status_text_syncdb").innerText ='sync done'
            document.getElementById("sys_status_icon_syncdb").className = 'fa fa-refresh text-success'
     }
+
+
+    function sys_status_syncupdb_idle() {
+           document.getElementById("sys_status_text_syncupdb").innerText ='up idle'
+           document.getElementById("sys_status_icon_syncupdb").className = 'fa fa-refresh text-success'
+    }
+    function sys_status_syncupdb_active() {
+           document.getElementById("sys_status_text_syncupdb").innerText ='up syncing'
+           document.getElementById("sys_status_icon_syncupdb").className = 'fa fa-refresh fa-spin text-warning'
+    }
+    function sys_status_syncupdb_tick() {
+           //document.getElementById("sys_status_text_syncdb").innerText ='idle'
+           //document.getElementById("sys_status_icon_syncdb").className = 'fa fa-database text-success'
+    }
+    function sys_status_syncupdb_error() {
+           document.getElementById("sys_status_text_syncupdb").innerText ='up sync error'
+           document.getElementById("sys_status_icon_syncupdb").className = 'fa fa-refresh text-danger'
+    }
+    function sys_status_syncupdb_done() {
+           document.getElementById("sys_status_text_syncupdb").innerText ='up sync done'
+           document.getElementById("sys_status_icon_syncupdb").className = 'fa fa-refresh text-success'
+    }
+
 
     function set_focus() {
       document.getElementById("decode_input").focus();
