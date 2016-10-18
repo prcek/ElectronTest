@@ -382,7 +382,7 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
   ev.preventDefault(); 
   val = document.getElementById("decode_input").value;
   document.getElementById("decode_input").value = "";
-  console.log(val);
+  //console.log(val);
 
   if (val.startsWith("TS*")) {
     if (!check_ts_crc(val)) {
@@ -425,8 +425,59 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
       SCAN_RESULT.show_error("Neplatný ochraný kód.");
     } else {
       d = unpack_json(val.split("\*")[1]);
-      //console.log(d);
-      SCAN_RESULT.show_setup(d.id);
+      if (d.id == "C_SETUP") {
+        cdb_get_course(d.course_id,function(c){
+          if (c) {
+            PRESENCE.init();
+            PRESENCE.add_course(c);
+            clear_presence_stats();
+            update_presence_filter();
+            SCAN_RESULT.show_setup_ok("Nastaven kurz " + c.code);
+          } else{ 
+            SCAN_RESULT.show_setup_error("Neznámý kurz");
+          }
+        });
+      } else if (d.id == "C_SETUP_GM") {
+        cdb_get_course(d.course_id,function(c){
+          if (c) {
+            PRESENCE.init();
+            PRESENCE.add_course(c);
+            clear_presence_stats();
+            update_presence_filter();
+            cdb_get_course_sib(course_key,function(courses){
+              for(var i = 0; i < courses.length; i++) {
+                PRESENCE.add_course_hm(courses[i])
+              }
+              update_presence_filter();
+              SCAN_RESULT.show_setup_ok("Nastaven kurz " + c.code + " a hostující kluci");
+            });
+          } else { 
+            SCAN_RESULT.show_setup_error("Neznámý kurz");
+          }
+        });
+      } else if (d.id == "C_ADD") {
+        cdb_get_course(d.course_id,function(c){
+          if (c) {
+            PRESENCE.add_course(c);
+            update_presence_filter();
+            SCAN_RESULT.show_setup_ok("Přidán kurz " + c.code);
+          } else{ 
+            SCAN_RESULT.show_setup_error("Neznámý kurz");
+          }
+        });
+      } else if (d.id == "C_ADD_M") {
+        cdb_get_course(d.course_id,function(c){
+          if (c) {
+            PRESENCE.add_course_hm(c);
+            update_presence_filter();
+            SCAN_RESULT.show_setup_ok("Přidáni kluci z kurzu " + c.code);
+          } else{ 
+            SCAN_RESULT.show_setup_error("Neznámý kurz");
+          }
+        });
+      } else {
+        SCAN_RESULT.show_setup_error("Neznámá příkazová karta");
+      }
     }
   } else {
       SCAN_RESULT.show_error("Neznámý typ karty.")

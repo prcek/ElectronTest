@@ -300,7 +300,7 @@
     function set_focus() {
       document.getElementById("decode_input").focus();
     }
-    
+
     /////////////////////  scan ////////////////
 
 var SCAN_RESULT = (function() {
@@ -481,8 +481,20 @@ var SCAN_RESULT = (function() {
       plan_clear();
   }
 
-  my.show_setup = function (desc) {
+  my.show_setup_ok = function (desc) {
       set_positive();
+      set_setup();
+      if (desc) {
+        scn_res_name_div.innerText = desc;
+      } else {
+        scn_res_name_div.innerText = "?";
+      }
+      window.setTimeout(stop_anim,post_flash_delay);
+      plan_clear();
+  }
+
+  my.show_setup_error = function (desc) {
+      set_negative();
       set_setup();
       if (desc) {
         scn_res_name_div.innerText = desc;
