@@ -15,7 +15,14 @@
       #sys_bar {
         padding: 10px;
       }
-      
+      #clock {
+        font-size: 5em;
+      }
+
+      #stat_bar {
+        padding: 10px;
+      }
+
       div.main { height: 500px; }
       div.vhcenter { 
         position:relative;
@@ -24,6 +31,10 @@
         text-align: center;
       }
 
+      .presence_stats {
+        font-size: 5em;
+        padding-left: 10px;
+      }
       .bigfont {
         font-size: 8em;
       }
@@ -169,14 +180,42 @@
     </div>
     <div class="row splitbg"></div>
 
+    <div id="stat_bar" class="row">
+
+     <div class="col-xs-4">
+        <div id="clock">
+         XX:XX:XX
+        </div>
+     </div>
+
+     <div class="col-xs-8">
+
+     <span class="pull-right">
+   
+
+          <span class="presence_stats">
+            <i class="fa fa-male"></i>
+            <span id="presence_stats_male">?</span>
+          </span>
+
+          <span class="presence_stats">
+            <i class="fa fa-female"></i>
+            <span id="presence_stats_female">?</span>
+          </span>
+
+         <span class="presence_stats">
+            <span>&sum;</span>
+            <span id="presence_stats_total">?</span>
+          </span>
+      </span>
+     </div>
+
+  
+    </div>
+    <div class="row splitbg"></div>
+
     <div id="mainbar" class="row main">  <!-- main row -->
      <div class="col-xs-4 main">
-     <div id="clock">
-     XX:XX:XX
-     </div>
-     <div>
-       celkem:<span id="presence_stats_total"></span>, kluku:<span id="presence_stats_male"></span>, holek: <span id="presence_stats_female"></span>
-     </div>
      <div id="presence_filter">
      &nbsp;
      </div>
