@@ -57,6 +57,10 @@
       .medfont {
         font-size: 3em;
       }
+
+      .filter_font {
+        font-size: 2em;
+      }
       .redbg {
         background-color: red;
       }
@@ -70,7 +74,6 @@
         margin-top: 5px;
         margin-bottom: 5px;
       }
-
 
       div.flash_border {
         padding: 10px;
@@ -154,7 +157,7 @@
     </div> <!-- end of sysbar -->
  
 
-    <div id="manual_setbar"> <!-- (status, cfg) row --> 
+    <div id="manual_setbar" class="row"> <!-- (status, cfg) row --> 
 
     <div class="row">
       <form>
@@ -187,6 +190,7 @@
       </div>
     </div>
     </div>
+
     <div class="row splitbg"></div>
 
     <div id="stat_bar" class="row">
@@ -275,20 +279,37 @@
 
   <div style="display:none">
    <div id="tpl_course" type="x-tmpl-mustache">
-     <div> Kurz:
-       <ul>
-         {{#courses}} 
-         <li>{{code}} - {{card_line_1}}</li>
-         {{/courses}}
-       </ul>
+     <div class="filter_font"> 
+        {{^courses.length}}
+          Není zvolen kurz!
+        {{/courses.length}}
+
+        {{#courses.length}}
+          Vstup do kurzu
+           <ul>
+             {{#courses}} 
+             <li>{{code}} - {{card_line_1}}</li>
+             {{/courses}}
+           </ul>
+        {{/courses.length}}
+
      </div>
-     <div> 
-      Pánové z kurzů:
+     <div> &nbsp; </div>
+     <div class="filter_font"> 
+
+      {{^courses_hm.length}}
+      Bez hostování pánů.
+      {{/courses_hm.length}}
+
+      {{#courses_hm.length}}
+      Hostování pánů z kurzů
       <div>
          {{#courses_hm}} 
          <span>{{code}}</span>
          {{/courses_hm}}
       </div>
+      {{/courses_hm.length}}
+
      </div>
    </div>
   </div>

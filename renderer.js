@@ -593,7 +593,7 @@ SCAN_RESULT.show_ready();
 PRESENCE = require("./presence.js");
 PRESENCE.init();
 clear_presence_stats();
-
+update_presence_filter();
 ///////////////////////////////
 if (ipcRenderer.sendSync('get_config', 'debug')) {
   document.getElementById("debugbar").style.display=null;
