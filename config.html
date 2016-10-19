@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello World!</title>
+    <title>Nastavení parametrů</title>
     <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
    body { margin: 32px; }
@@ -12,15 +12,15 @@
 
   </head>
   <body>
-    <h1>Config</h1>
+    <h1>Parametry</h1>
     <form>
 	<div class="form-group">
 
     		<label for="input_cdb_url">CDB url</label>
-    		<input type="url" class="form-control" id="input_cdb_url" placeholder="Url">
+    		<input type="url" class="form-control" id="input_cdb_url" placeholder="Url - https://user:password@cdb.server.tld/dbname">
 
         <label for="input_upcdb_url">UpLink CDB url</label>
-        <input type="url" class="form-control" id="input_upcdb_url" placeholder="Url">
+        <input type="url" class="form-control" id="input_upcdb_url" placeholder="Url - https://user:password@cdb.server.tld/pdbname">
 
         <label for="input_autofs">zapnout ve fullscreen</label>
         <input type="checkbox" class="form-control" id="input_autofs">
@@ -28,13 +28,13 @@
         <label for="input_debug">Debug</label>
         <input type="checkbox" class="form-control" id="input_debug">
 
-        <label for="input_station_name">Jmeno QR stanice</label>
+        <label for="input_station_name">Jmeno stanice</label>
         <input type="text" class="form-control" id="input_station_name">
 
   	</div>
     </form>
     <button id="close-btn" class="btn btn-default btn-xs">close &amp; save</button>
-    <h1>Versions</h1>
+    <h1>Verze komponent</h1>
       <div>
         Node <script>document.write(process.versions.node)</script>,
         Chromium <script>document.write(process.versions.chrome)</script>,
