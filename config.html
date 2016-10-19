@@ -28,9 +28,6 @@
         <label for="input_debug">Debug</label>
         <input type="checkbox" class="form-control" id="input_debug">
 
-        <label for="input_scanbox_height">Vyska scan boxu</label>
-        <input type="number" class="form-control" id="input_scanbox_height">
-
         <label for="input_station_name">Jmeno QR stanice</label>
         <input type="text" class="form-control" id="input_station_name">
 
@@ -63,9 +60,6 @@
     val = document.getElementById("input_debug").checked;
     ipcRenderer.send("set_config","debug",val); 
 
-    val = document.getElementById("input_scanbox_height").value;
-    ipcRenderer.send("set_config","scanbox_height",val); 
-
     val = document.getElementById("input_station_name").value;
     ipcRenderer.send("set_config","station_name",val); 
 
@@ -88,10 +82,6 @@
     val = ipcRenderer.sendSync('get_config', 'debug');
     console.log("get debug " + val);
     document.getElementById("input_debug").checked = val;
-
-    val = ipcRenderer.sendSync('get_config', 'scanbox_height');
-    console.log("get scanbox_height " + val);
-    document.getElementById("input_scanbox_height").value = val;
 
     val = ipcRenderer.sendSync('get_config', 'station_name');
     console.log("get station_name " + val);

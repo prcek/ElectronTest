@@ -468,23 +468,10 @@ function timedformat(time) {
 var UUID = require('node-uuid'); 
 var STATION_NAME = ipcRenderer.sendSync('get_config', 'station_name');
 
-document.getElementById("qrcode_form").onsubmit = function(ev) {
-  ev.preventDefault(); 
-  val = document.getElementById("decode_input").value;
-  document.getElementById("decode_input").value = "";
-  //console.log(val);
-  ses = { "ts": Date.now(), "id": UUID.v4(), "station_name": STATION_NAME};
-  updb_store_new_presence({"type":"raw_scan", "data":val, "session": ses});
 
-  if (val.startsWith("TS*")) {
-    if (!check_ts_crc(val)) {
-      SCAN_RESULT.show_error("Neplatný ochraný kód.");
-      updb_store_new_presence({"type":"res", "data":"invalid_checksum", "session": ses});
-    } else {
-      d = unpack_json(val.split("\*")[2]);      
-      //console.log(d);
-      ref_gid = d.id;
-      updb_store_new_presence({"type":"decoded_ts", "data":ref_gid, "fulldata": d, "session": ses});
+function do_ts_attend(ref_gid,ses) {
+
+
       cdb_lookup(ref_gid,function(s){
         if (s == null) {
           SCAN_RESULT.show_error("Neznámý žák!");
@@ -518,6 +505,36 @@ document.getElementById("qrcode_form").onsubmit = function(ev) {
           }
         }
       });
+
+}
+
+
+document.getElementById("qrcode_form").onsubmit = function(ev) {
+  ev.preventDefault(); 
+  val = document.getElementById("decode_input").value;
+  document.getElementById("decode_input").value = "";
+  //console.log(val);
+  ses = { "ts": Date.now(), "id": UUID.v4(), "station_name": STATION_NAME};
+  updb_store_new_presence({"type":"raw_scan", "data":val, "session": ses});
+
+  if (val.startsWith("TS*")) {
+    if (!check_ts_crc(val)) {
+      SCAN_RESULT.show_error("Neplatný ochraný kód.");
+      updb_store_new_presence({"type":"res", "data":"invalid_checksum", "session": ses});
+    } else {
+      d = unpack_json(val.split("\*")[2]);      
+      //console.log(d);
+      ref_gid = d.id;
+      updb_store_new_presence({"type":"decoded_ts", "data":ref_gid, "fulldata": d, "session": ses});
+      do_ts_attend(ref_gid,ses);
+    }
+  } else if (val.startsWith("#")) {
+    ref_gid = parseInt(val.substr(1));
+    if (ref_gid) {
+      updb_store_new_presence({"type":"manual_ts", "data":ref_gid, "fulldata": val, "session": ses});
+      do_ts_attend(ref_gid,ses);      
+    } else {
+      SCAN_RESULT.show_error("Neplatný kód.");
     }
   } else if (val.startsWith("TS_CMD*")) {
     if (!check_tscmd_crc(val)) {
